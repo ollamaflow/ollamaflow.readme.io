@@ -551,8 +551,4 @@ cat frontends.json | jq '.[]' | while read frontend; do
 done
 ```
 
-## Next Steps
-
-* Review [API Reference](api-reference.md) for programmatic configuration
-* Explore [Deployment Options](deployment-options.md) for your infrastructure
-* Check [Monitoring and Observability](monitoring.md) for production insights
+<br />
