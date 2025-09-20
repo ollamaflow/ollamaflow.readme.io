@@ -269,9 +269,4 @@ Ensure you're using the correct bearer token:
 grep -A 5 "AdminBearerTokens" ollamaflow.json
 ```
 
-## Next Steps
-
-* Learn about [Core Concepts](core-concepts.md) for deeper understanding
-* Explore [Deployment Options](deployment-options.md) for production setups
-* Review [Configuration Examples](configuration-examples.md) for advanced scenarios
-* Check the [API Reference](api-reference.md) for complete API documentation
+<br />
