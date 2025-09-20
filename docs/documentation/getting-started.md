@@ -9,6 +9,8 @@ hidden: false
 
 OllamaFlow is an intelligent load balancer and model orchestration platform designed to transform multiple Ollama instances into a unified, high-availability AI inference cluster. Whether you're scaling AI workloads across multiple GPUs, ensuring zero-downtime model serving, or managing a distributed AI infrastructure, OllamaFlow provides the orchestration layer you need.
 
+OllamaFlow can be managed via the REST API documented here or using the [web dashboard](https://github.com/ollamaflow/ui) .
+
 ## What is OllamaFlow?
 
 OllamaFlow acts as an intelligent proxy layer that sits between your clients and multiple Ollama instances. It provides:
