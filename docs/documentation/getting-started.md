@@ -1,5 +1,5 @@
 ---
-title: OllamaFlow Documentation
+title: Introduction
 excerpt: >-
   This page will help you get started with OllamaFlow. You'll be up and running
   in a jiffy!
