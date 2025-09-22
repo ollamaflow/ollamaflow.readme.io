@@ -86,6 +86,10 @@ OllamaFlow uses a JSON configuration file (`ollamaflow.json`) that defines serve
   "DatabaseFilename": "ollamaflow.db",
   "AdminBearerTokens": [
     "your-secure-admin-token"
+  ],
+  "StickyHeaders": [
+    "x-conversation-id",
+    "x-thread-id"
   ]
 }
 ```
@@ -205,6 +209,12 @@ Modes:
 | Setting             | Type  | Default               | Description                        |
 | ------------------- | ----- | --------------------- | ---------------------------------- |
 | `AdminBearerTokens` | array | `["ollamaflowadmin"]` | Valid bearer tokens for admin APIs |
+
+### Sticky Headers
+
+The `StickyHeaders` string array specifies on which headers to match to uniquely identify a client when using session stickiness.  If you are not using session stickiness, set this to an empty array.  A case-insensitive comparison is used, meaning `x-conversation-id` and `X-Conversation-ID` are considered the same while evaluating headers.
+
+If no sticky headers are defined and session stickiness is enabled, the client IP address will be used as the client identifier.
 
 ## Frontend Configuration
 
