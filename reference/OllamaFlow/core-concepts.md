@@ -52,7 +52,9 @@ A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends d
 
 **How It Works:**
 
-1. **Client Identification**: Uses client IP address as identifier
+1. **Client Identification**: Uses the following values, in this order, to identify a client:  
+   1. A header value for any present HTTP header found in `Settings.StickyHeaders`; the default headers are `x-conversation-id` and `x-thread-id`
+   2. Client IP address
 2. **Backend Binding**: First request creates a session binding client to a specific backend
 3. **Session Persistence**: Subsequent requests from the same client route to the bound backend
 4. **Automatic Expiration**: Sessions expire after the configured timeout period
