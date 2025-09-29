@@ -584,6 +584,74 @@ The collection includes:
 * Environment variables for easy configuration
 * Response examples and test scripts
 
+## Security and Access Control
+
+OllamaFlow provides comprehensive security controls through Frontend and Backend configuration:
+
+### Request Type Controls
+
+* **AllowEmbeddings**: Controls access to embeddings endpoints
+  - Ollama API: `/api/embed`
+  - OpenAI API: `/v1/embeddings`
+* **AllowCompletions**: Controls access to completion endpoints
+  - Ollama API: `/api/generate`, `/api/chat`
+  - OpenAI API: `/v1/completions`, `/v1/chat/completions`
+
+For a request to succeed, both the frontend and at least one assigned backend must allow the request type.
+
+### Pinned Properties
+
+Administrators can enforce specific parameters in requests through pinned properties:
+
+* **PinnedEmbeddingsProperties**: Key-value pairs merged into all embeddings requests
+* **PinnedCompletionsProperties**: Key-value pairs merged into all completion requests
+
+Pinned properties take precedence over client-specified values, enabling organizational compliance and standardization.
+
+### Example Security Configuration
+
+```bash
+# Create a frontend that only allows completions with enforced temperature
+curl -X PUT \
+  -H "Authorization: Bearer your-admin-token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Identifier": "secure-frontend",
+    "Name": "Secure Completions Only",
+    "AllowEmbeddings": false,
+    "AllowCompletions": true,
+    "PinnedCompletionsProperties": {
+      "options": {
+        "temperature": 0.7,
+        "num_ctx": 2048
+      }
+    },
+    "Backends": ["secure-backend"]
+  }' \
+  http://localhost:43411/v1.0/frontends
+```
+
+With this configuration:
+- ✅ **Allowed**: Completion requests to both API formats
+  - `POST /api/generate` (Ollama)
+  - `POST /api/chat` (Ollama)
+  - `POST /v1/completions` (OpenAI)
+  - `POST /v1/chat/completions` (OpenAI)
+- ❌ **Blocked**: Embeddings requests to both API formats
+  - `POST /api/embed` (Ollama)
+  - `POST /v1/embeddings` (OpenAI)
+
+## API Explorer
+
+OllamaFlow includes a companion web-based API Explorer for testing and validation:
+
+* **Repository**: [https://github.com/ollamaflow/apiexplorer](https://github.com/ollamaflow/apiexplorer)
+* **Purpose**: Test and evaluate APIs in scaled inference architectures
+* **Features**: Real-time API testing, JSON validation, response inspection
+* **Formats**: Supports both Ollama and OpenAI API formats
+
+The API Explorer provides an intuitive interface for development debugging, load testing, and integration validation.
+
 ## SDK and Client Libraries
 
 OllamaFlow is compatible with existing Ollama client libraries:
