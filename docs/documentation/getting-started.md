@@ -75,6 +75,41 @@ Bearer token authentication, comprehensive logging, and RESTful administration A
 * **Multi-Tenant Scenarios**: Isolate workloads while sharing infrastructure
 * **Cost Optimization**: Maximize hardware utilization across your AI infrastructure
 
+## API Explorer
+
+OllamaFlow includes a companion web-based API Explorer for testing and evaluating APIs. The API Explorer provides an intuitive interface for:
+
+* **API Testing**: Test both Ollama and OpenAI-compatible API formats
+* **Real-time Validation**: Validate API requests with JSON syntax checking
+* **Development Debugging**: Inspect response bodies and headers for troubleshooting
+* **Load Testing**: Evaluate API performance under different conditions
+* **Integration Testing**: Validate OllamaFlow behavior in scaled inference architectures
+
+The API Explorer is available at: [https://github.com/ollamaflow/apiexplorer](https://github.com/ollamaflow/apiexplorer)
+
+### Quick Start with API Explorer
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/ollamaflow/apiexplorer.git
+   cd apiexplorer
+   ```
+
+2. **Open the explorer**:
+   ```bash
+   # Simply open index.html in your browser
+   open index.html  # macOS
+   # or
+   xdg-open index.html  # Linux
+   ```
+
+3. **Configure for OllamaFlow**:
+   - Set the base URL to your OllamaFlow instance (e.g., `http://localhost:43411`)
+   - Select your preferred API format (Ollama or OpenAI)
+   - Choose your model and start testing
+
+The API Explorer supports both streaming and non-streaming completions, embeddings testing, and provides detailed response inspection capabilities.
+
 ## Next Steps
 
 * Learn about [Core Concepts](core-concepts.md) to understand frontends, backends, and models

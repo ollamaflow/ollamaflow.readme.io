@@ -223,6 +223,20 @@ Frontends are virtual Ollama endpoints that clients connect to. They are stored 
   "MaxRequestBodySize": 1073741824,
   "Backends": ["gpu-1", "gpu-2", "gpu-3"],
   "RequiredModels": ["llama3:8b", "mistral:7b"],
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "model": "nomic-embed-text",
+    "options": {
+      "temperature": 0.1
+    }
+  },
+  "PinnedCompletionsProperties": {
+    "options": {
+      "temperature": 0.7,
+      "num_ctx": 2048
+    }
+  },
   "LogRequestFull": false,
   "LogRequestBody": false,
   "LogResponseBody": false,
@@ -245,6 +259,10 @@ Frontends are virtual Ollama endpoints that clients connect to. They are stored 
 | `MaxRequestBodySize`        | integer | `536870912`    | Max request size in bytes (512MB)                |
 | `Backends`                  | array   | `[]`           | List of backend identifiers                      |
 | `RequiredModels`            | array   | `[]`           | Models that must be available                    |
+| `AllowEmbeddings`           | boolean | `true`         | Allow embeddings API requests                    |
+| `AllowCompletions`          | boolean | `true`         | Allow completions API requests                   |
+| `PinnedEmbeddingsProperties`| object  | `{}`           | Key-value pairs merged into embeddings requests  |
+| `PinnedCompletionsProperties`| object | `{}`           | Key-value pairs merged into completions requests |
 | `UseStickySessions`         | boolean | `false`        | Enable session stickiness                        |
 | `StickySessionExpirationMs` | integer | `1800000`      | Session timeout (30 minutes, min: 10s, max: 24h) |
 | `LogRequestFull`            | boolean | `false`        | Log complete requests                            |
@@ -262,6 +280,36 @@ Frontends are virtual Ollama endpoints that clients connect to. They are stored 
 * `"*"`: Match all hostnames (catch-all)
 * `"api.company.com"`: Exact hostname match
 * Multiple frontends can exist with different hostname patterns
+
+### Security Controls
+
+Frontend security controls enable fine-grained access control and request parameter enforcement:
+
+#### Request Type Controls
+
+* **`AllowEmbeddings`**: Controls whether embeddings API endpoints are accessible through this frontend
+  - Ollama API: `/api/embed`
+  - OpenAI API: `/v1/embeddings`
+* **`AllowCompletions`**: Controls whether completion API endpoints are accessible through this frontend
+  - Ollama API: `/api/generate`, `/api/chat`
+  - OpenAI API: `/v1/completions`, `/v1/chat/completions`
+
+For a request to succeed, both the frontend and at least one assigned backend must allow the request type.
+
+#### Pinned Properties
+
+Pinned properties allow administrators to enforce specific parameters in requests, providing security compliance and standardization:
+
+* **`PinnedEmbeddingsProperties`**: Key-value pairs automatically merged into all embeddings requests
+* **`PinnedCompletionsProperties`**: Key-value pairs automatically merged into all completion requests
+
+Common use cases:
+* Enforce maximum context size: `{"options": {"num_ctx": 2048}}`
+* Standardize temperature settings: `{"options": {"temperature": 0.7}}`
+* Override model selection: `{"model": "approved-model:latest"}`
+* Set organizational defaults: `{"options": {"top_p": 0.9, "top_k": 40}}`
+
+Properties are merged with client requests, with pinned properties taking precedence over client-specified values.
 
 ## Backend Configuration
 
@@ -282,6 +330,19 @@ Backends represent physical Ollama instances in your infrastructure.
   "HealthCheckUrl": "/api/version",
   "MaxParallelRequests": 8,
   "RateLimitRequestsThreshold": 20,
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "options": {
+      "num_ctx": 512
+    }
+  },
+  "PinnedCompletionsProperties": {
+    "options": {
+      "num_ctx": 4096,
+      "temperature": 0.8
+    }
+  },
   "LogRequestFull": false,
   "LogRequestBody": false,
   "LogResponseBody": false,
@@ -304,6 +365,10 @@ Backends represent physical Ollama instances in your infrastructure.
 | `HealthCheckUrl`             | string  | `"/"`    | URL path for health checks               |
 | `MaxParallelRequests`        | integer | `4`      | Maximum concurrent requests              |
 | `RateLimitRequestsThreshold` | integer | `10`     | Rate limiting threshold                  |
+| `AllowEmbeddings`            | boolean | `true`   | Allow embeddings API requests            |
+| `AllowCompletions`           | boolean | `true`   | Allow completions API requests           |
+| `PinnedEmbeddingsProperties` | object  | `{}`     | Key-value pairs merged into embeddings requests |
+| `PinnedCompletionsProperties`| object  | `{}`     | Key-value pairs merged into completions requests |
 | `LogRequestFull`             | boolean | `false`  | Log complete requests                    |
 | `LogRequestBody`             | boolean | `false`  | Log request bodies                       |
 | `LogResponseBody`            | boolean | `false`  | Log response bodies                      |
@@ -330,6 +395,38 @@ Backends can enforce rate limits:
 * Requests exceeding `RateLimitRequestsThreshold` receive HTTP 429
 * Rate limiting is per backend, not global
 * Helps protect individual Ollama instances from overload
+
+### Security Controls
+
+Backend security controls provide additional layers of request filtering and parameter enforcement:
+
+#### Request Type Controls
+
+* **`AllowEmbeddings`**: Controls whether this backend can process embeddings requests
+* **`AllowCompletions`**: Controls whether this backend can process completion requests
+
+Requests are only routed to backends that allow the specific request type. This enables:
+* Dedicated embeddings servers that only handle embeddings requests:
+  - Ollama API: `/api/embed`
+  - OpenAI API: `/v1/embeddings`
+* Completion-only servers that only handle completion requests:
+  - Ollama API: `/api/generate`, `/api/chat`
+  - OpenAI API: `/v1/completions`, `/v1/chat/completions`
+* Multi-tenant isolation by request type
+
+#### Pinned Properties
+
+Backend pinned properties provide server-level parameter enforcement:
+
+* **`PinnedEmbeddingsProperties`**: Applied to all embeddings requests routed to this backend
+* **`PinnedCompletionsProperties`**: Applied to all completion requests routed to this backend
+
+Backend pinned properties are merged after frontend pinned properties, allowing for:
+* Server-specific resource limits: `{"options": {"num_ctx": 1024}}`
+* Hardware-optimized settings: `{"options": {"num_gpu": 2}}`
+* Backend-specific model overrides: `{"model": "server-optimized-model"}`
+
+The merge order is: Client Request → Frontend Pinned Properties → Backend Pinned Properties, with later values taking precedence.
 
 ## Environment Variables
 
