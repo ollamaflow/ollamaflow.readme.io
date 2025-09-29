@@ -24,7 +24,7 @@ docker run -d \
   --restart unless-stopped \
   -p 43411:43411 \
   -v /opt/ollamaflow/data:/app/data \
-  jchristn/ollamaflow
+  jchristn/ollamaflow:v1.0.0
 ```
 
 ### Production Container Setup
@@ -66,7 +66,7 @@ docker run -d \
   -v /opt/ollamaflow/ollamaflow.json:/app/ollamaflow.json:ro \
   -v /opt/ollamaflow/data:/app/data \
   -v /opt/ollamaflow/logs:/app/logs \
-  jchristn/ollamaflow
+  jchristn/ollamaflow:v1.0.0
 ```
 
 ### Docker Compose
@@ -79,7 +79,7 @@ version: '3.8'
 
 services:
   ollamaflow:
-    image: jchristn/ollamaflow:latest
+    image: jchristn/ollamaflow:v1.0.0
     container_name: ollamaflow
     restart: unless-stopped
     ports:
@@ -287,7 +287,7 @@ spec:
     spec:
       containers:
       - name: ollamaflow
-        image: jchristn/ollamaflow:latest
+        image: jchristn/ollamaflow:v1.0.0
         ports:
         - containerPort: 43411
         env:

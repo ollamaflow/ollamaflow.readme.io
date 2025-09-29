@@ -664,8 +664,6 @@ OllamaFlow is compatible with existing Ollama client libraries:
 
 Simply point these libraries to your OllamaFlow endpoint instead of a direct Ollama instance.
 
-## Next Steps
+## User Interface
 
-* Explore [Configuration Examples](configuration-examples.md) for common scenarios
-* Review [REST API Basics](rest-api-basics.md) for API fundamentals
-* Check [Monitoring and Observability](monitoring.md) for production insights
+Download the web user interface for OllamaFlow [here](https://github.com/ollamaflow/ui) .

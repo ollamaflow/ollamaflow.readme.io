@@ -12,9 +12,9 @@ metadata:
 
 Before starting, ensure you have:
 
-* One or more Ollama instances running
+* One or more Ollama or OpenAI API-compatible embeddings or inference instances running
 * .NET 8.0 Runtime (for source deployment) or Docker (for container deployment)
-* Network connectivity between OllamaFlow and your Ollama instances
+* Network connectivity between OllamaFlow and your backend instances
 
 ## Option 1: Docker Deployment (Recommended)
 
@@ -31,7 +31,7 @@ docker run -d \
   --name ollamaflow \
   -p 43411:43411 \
   -v $(pwd)/ollamaflow-data:/app/data \
-  jchristn/ollamaflow
+  jchristn/ollamaflow:v1.0.0
 ```
 
 ### Custom Configuration
@@ -66,7 +66,7 @@ docker run -d \
   -p 43411:43411 \
   -v $(pwd)/ollamaflow.json:/app/ollamaflow.json:ro \
   -v $(pwd)/ollamaflow-data:/app/data \
-  jchristn/ollamaflow
+  jchristn/ollamaflow:v1.0.0
 ```
 
 ## Option 2: Build from Source
@@ -128,7 +128,7 @@ Content-Type: application/json
 
 ## Configure Your First Backend
 
-Add your Ollama instance as a backend:
+Add your Ollama or OpenAI compatible instance as a backend:
 
 ```bash
 # Add a backend (replace with your Ollama server details)
@@ -140,7 +140,8 @@ curl -X PUT \
     "Name": "My Ollama Instance",
     "Hostname": "192.168.1.100",
     "Port": 11434,
-    "MaxParallelRequests": 4
+    "MaxParallelRequests": 4,
+    "ApiFormat": "Ollama"
   }' \
   http://localhost:43411/v1.0/backends
 ```
@@ -268,5 +269,3 @@ Ensure you're using the correct bearer token:
 # Check your configuration file for the correct token
 grep -A 5 "AdminBearerTokens" ollamaflow.json
 ```
-
-<br />
