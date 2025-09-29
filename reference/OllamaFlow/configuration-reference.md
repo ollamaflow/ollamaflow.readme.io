@@ -292,6 +292,7 @@ Backends represent physical Ollama instances in your infrastructure.
   "HealthCheckUrl": "/api/version",
   "MaxParallelRequests": 8,
   "RateLimitRequestsThreshold": 20,
+  "ApiFormat": "Ollama",
   "LogRequestFull": false,
   "LogRequestBody": false,
   "LogResponseBody": false,
@@ -301,23 +302,24 @@ Backends represent physical Ollama instances in your infrastructure.
 
 ### Backend Properties
 
-| Property                     | Type    | Default  | Description                              |
-| ---------------------------- | ------- | -------- | ---------------------------------------- |
-| `Identifier`                 | string  | Required | Unique identifier for this backend       |
-| `Name`                       | string  | Required | Human-readable name                      |
-| `Hostname`                   | string  | Required | Backend server hostname/IP               |
-| `Port`                       | integer | `11434`  | Backend server port                      |
-| `Ssl`                        | boolean | `false`  | Use HTTPS for backend communication      |
-| `UnhealthyThreshold`         | integer | `2`      | Failed checks before marking unhealthy   |
-| `HealthyThreshold`           | integer | `2`      | Successful checks before marking healthy |
-| `HealthCheckMethod`          | string  | `"GET"`  | HTTP method for health checks            |
-| `HealthCheckUrl`             | string  | `"/"`    | URL path for health checks               |
-| `MaxParallelRequests`        | integer | `4`      | Maximum concurrent requests              |
-| `RateLimitRequestsThreshold` | integer | `10`     | Rate limiting threshold                  |
-| `LogRequestFull`             | boolean | `false`  | Log complete requests                    |
-| `LogRequestBody`             | boolean | `false`  | Log request bodies                       |
-| `LogResponseBody`            | boolean | `false`  | Log response bodies                      |
-| `Active`                     | boolean | `true`   | Whether backend is active                |
+| Property                     | Type    | Default  | Description                                     |
+| ---------------------------- | ------- | -------- | ----------------------------------------------- |
+| `Identifier`                 | string  | Required | Unique identifier for this backend              |
+| `Name`                       | string  | Required | Human-readable name                             |
+| `Hostname`                   | string  | Required | Backend server hostname/IP                      |
+| `Port`                       | integer | `11434`  | Backend server port                             |
+| `Ssl`                        | boolean | `false`  | Use HTTPS for backend communication             |
+| `UnhealthyThreshold`         | integer | `2`      | Failed checks before marking unhealthy          |
+| `HealthyThreshold`           | integer | `2`      | Successful checks before marking healthy        |
+| `HealthCheckMethod`          | string  | `"GET"`  | HTTP method for health checks                   |
+| `HealthCheckUrl`             | string  | `"/"`    | URL path for health checks                      |
+| `MaxParallelRequests`        | integer | `4`      | Maximum concurrent requests                     |
+| `RateLimitRequestsThreshold` | integer | `10`     | Rate limiting threshold                         |
+| `ApiFormat`                  | string  | `Ollama` | Backend API format, either `Ollama` or `OpenAI` |
+| `LogRequestFull`             | boolean | `false`  | Log complete requests                           |
+| `LogRequestBody`             | boolean | `false`  | Log request bodies                              |
+| `LogResponseBody`            | boolean | `false`  | Log response bodies                             |
+| `Active`                     | boolean | `true`   | Whether backend is active                       |
 
 ### Health Check Configuration
 
@@ -326,6 +328,8 @@ Health checks validate backend availability:
 * **Method**: HTTP method (GET, HEAD, POST)
 * **URL**: Path to check (e.g., `/`, `/api/version`, `/health`)
 * **Thresholds**: Number of consecutive successes/failures to change state
+
+**IMPORTANT**: vLLM expects healthchecks on `GET /health`
 
 Common health check endpoints:
 
