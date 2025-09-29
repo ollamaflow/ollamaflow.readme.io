@@ -11,22 +11,22 @@ metadata:
 ---
 ## Frontends
 
-A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends define how requests are routed and which backends serve those requests.
+A **Frontend** is a virtual Ollama or OpenAI compatible endpoint that clients connect to. Frontends define how requests are routed and which backends serve those requests.
 
 ### Frontend Properties
 
-| Property                    | Description                          | Default             |
-| --------------------------- | ------------------------------------ | ------------------- |
-| `Identifier`                | Unique identifier for the frontend   | Required            |
-| `Name`                      | Human-readable name                  | Required            |
-| `Hostname`                  | Hostname pattern (`*` for catch-all) | `*`                 |
-| `TimeoutMs`                 | Request timeout in milliseconds      | `60000`             |
-| `LoadBalancing`             | Load balancing algorithm             | `RoundRobin`        |
-| `Backends`                  | List of backend identifiers to use   | `[]`                |
-| `RequiredModels`            | Models that must be available        | `[]`                |
-| `MaxRequestBodySize`        | Maximum request size in bytes        | `536870912` (512MB) |
-| `UseStickySessions`         | Enable session stickiness            | `false`             |
-| `StickySessionExpirationMs` | Session timeout in milliseconds      | `1800000` (30 min)  |
+| Property                    | Description                                               | Default             |
+| --------------------------- | --------------------------------------------------------- | ------------------- |
+| `Identifier`                | Unique identifier for the frontend                        | Required            |
+| `Name`                      | Human-readable name                                       | Required            |
+| `Hostname`                  | Hostname pattern (`*` for catch-all)                      | `*`                 |
+| `TimeoutMs`                 | Request timeout in milliseconds                           | `60000`             |
+| `LoadBalancing`             | Load balancing algorithm                                  | `RoundRobin`        |
+| `Backends`                  | List of backend identifiers to use                        | `[]`                |
+| `RequiredModels`            | Models that must be available (only for Ollama instances) | `[]`                |
+| `MaxRequestBodySize`        | Maximum request size in bytes                             | `536870912` (512MB) |
+| `UseStickySessions`         | Enable session stickiness                                 | `false`             |
+| `StickySessionExpirationMs` | Session timeout in milliseconds                           | `1800000` (30 min)  |
 
 ### Load Balancing Algorithms
 
@@ -52,7 +52,7 @@ A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends d
 
 **How It Works:**
 
-1. **Client Identification**: Uses the following values, in this order, to identify a client:  
+1. **Client Identification**: Uses the following values, in this order, to identify a client:
    1. A header value for any present HTTP header found in `Settings.StickyHeaders`; the default headers are `x-conversation-id` and `x-thread-id`
    2. Client IP address
 2. **Backend Binding**: First request creates a session binding client to a specific backend
@@ -97,19 +97,20 @@ A **Backend** represents a physical Ollama instance in your infrastructure. Back
 
 ### Backend Properties
 
-| Property                     | Description                              | Default  |
-| ---------------------------- | ---------------------------------------- | -------- |
-| `Identifier`                 | Unique identifier for the backend        | Required |
-| `Name`                       | Human-readable name                      | Required |
-| `Hostname`                   | Ollama server hostname/IP                | Required |
-| `Port`                       | Ollama server port                       | `11434`  |
-| `Ssl`                        | Enable HTTPS for backend communication   | `false`  |
-| `HealthCheckUrl`             | URL path for health checks               | `/`      |
-| `HealthCheckMethod`          | HTTP method for health checks            | `GET`    |
-| `UnhealthyThreshold`         | Failed checks before marking unhealthy   | `2`      |
-| `HealthyThreshold`           | Successful checks before marking healthy | `2`      |
-| `MaxParallelRequests`        | Maximum concurrent requests              | `4`      |
-| `RateLimitRequestsThreshold` | Rate limiting threshold                  | `10`     |
+| Property                     | Description                                     | Default  |
+| ---------------------------- | ----------------------------------------------- | -------- |
+| `Identifier`                 | Unique identifier for the backend               | Required |
+| `Name`                       | Human-readable name                             | Required |
+| `Hostname`                   | Ollama server hostname/IP                       | Required |
+| `Port`                       | Ollama server port                              | `11434`  |
+| `Ssl`                        | Enable HTTPS for backend communication          | `false`  |
+| `HealthCheckUrl`             | URL path for health checks                      | `/`      |
+| `HealthCheckMethod`          | HTTP method for health checks                   | `GET`    |
+| `UnhealthyThreshold`         | Failed checks before marking unhealthy          | `2`      |
+| `HealthyThreshold`           | Successful checks before marking healthy        | `2`      |
+| `MaxParallelRequests`        | Maximum concurrent requests                     | `4`      |
+| `RateLimitRequestsThreshold` | Rate limiting threshold                         | `10`     |
+| `ApiFormat`                  | Backend API format, either `Ollama` or `OpenAI` | `Ollama` |
 
 ### Health Monitoring
 
@@ -139,13 +140,14 @@ OllamaFlow continuously monitors backend health:
   "UnhealthyThreshold": 3,
   "HealthyThreshold": 2,
   "MaxParallelRequests": 8,
-  "RateLimitRequestsThreshold": 20
+  "RateLimitRequestsThreshold": 20,
+  "ApiFormat": "Ollama"
 }
 ```
 
 ## Models
 
-OllamaFlow provides intelligent model management across your backend fleet.
+OllamaFlow provides intelligent model management across your backend Ollama fleet.  This set of capabilities is not available for OpenAI-compatible backend instances.
 
 ### Model Discovery
 
