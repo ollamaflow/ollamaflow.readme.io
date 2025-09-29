@@ -1,10 +1,11 @@
 ---
 title: API Reference
 excerpt: >-
-  OllamaFlow provides two sets of APIs: **Ollama-compatible APIs** for AI
-  inference and **Administrative APIs** for cluster management. All APIs support
-  JSON request/response format and maintain full compatibility with existing
-  Ollama clients.
+  OllamaFlow provides three sets of APIs: **Ollama-compatible APIs** for AI
+  inference and embeddings, **OpenAI-compatible APIs** for inference and
+  embeddings, and **Administrative APIs** for cluster management. All APIs
+  support JSON request/response format and maintain full compatibility with
+  existing Ollama clients.
 deprecated: false
 hidden: false
 metadata:
