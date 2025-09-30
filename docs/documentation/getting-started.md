@@ -87,6 +87,17 @@ OllamaFlow includes a companion web-based API Explorer for testing and evaluatin
 
 The API Explorer is available at: [https://github.com/ollamaflow/apiexplorer](https://github.com/ollamaflow/apiexplorer)
 
+### Why the API Explorer is Useful
+
+The API Explorer serves as a comprehensive user interface for OllamaFlow, providing:
+
+* **No Setup Required**: Simple web-based interface that runs in any browser
+* **Multi-Format Testing**: Test both Ollama and OpenAI API formats in one tool
+* **Real-Time Feedback**: Immediate validation of requests and responses
+* **Development Workflow**: Essential for debugging API integrations and testing configurations
+* **Load Testing**: Evaluate performance characteristics before production deployment
+* **Educational Tool**: Learn API patterns and explore model capabilities interactively
+
 ### Quick Start with API Explorer
 
 1. **Clone the repository**:
