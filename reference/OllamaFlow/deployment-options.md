@@ -1,9 +1,9 @@
 ---
 title: Deployment Options
 excerpt: >-
-  OllamaFlow supports multiple deployment methods to fit different
-  infrastructure requirements and preferences. Choose the option that best suits
-  your environment.
+  OllamaFlow supports multiple deployment methods to fit different  
+  infrastructure requirements and preferences. Choose the option that best
+  suits   your environment.
 deprecated: false
 hidden: false
 metadata:
@@ -24,7 +24,7 @@ docker run -d \
   --restart unless-stopped \
   -p 43411:43411 \
   -v /opt/ollamaflow/data:/app/data \
-  jchristn/ollamaflow:v1.0.0
+  jchristn/ollamaflow
 ```
 
 ### Production Container Setup
@@ -66,7 +66,7 @@ docker run -d \
   -v /opt/ollamaflow/ollamaflow.json:/app/ollamaflow.json:ro \
   -v /opt/ollamaflow/data:/app/data \
   -v /opt/ollamaflow/logs:/app/logs \
-  jchristn/ollamaflow:v1.0.0
+  jchristn/ollamaflow
 ```
 
 ### Docker Compose
@@ -79,7 +79,7 @@ version: '3.8'
 
 services:
   ollamaflow:
-    image: jchristn/ollamaflow:v1.0.0
+    image: jchristn/ollamaflow:latest
     container_name: ollamaflow
     restart: unless-stopped
     ports:
@@ -287,7 +287,7 @@ spec:
     spec:
       containers:
       - name: ollamaflow
-        image: jchristn/ollamaflow:v1.0.0
+        image: jchristn/ollamaflow:latest
         ports:
         - containerPort: 43411
         env:
@@ -534,6 +534,29 @@ curl -H "Authorization: Bearer your-token" \
 ### Log Management
 
 Configure log rotation and management:
+
+```bash
+# Logrotate configuration
+sudo tee /etc/logrotate.d/ollamaflow > /dev/null << 'EOF'
+/var/log/ollamaflow/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    notifempty
+    create 0644 ollamaflow ollamaflow
+    postrotate
+        systemctl reload ollamaflow
+    endscript
+}
+EOF
+```
+
+## Next Steps
+
+* Review [Configuration Reference](configuration-reference.md) for detailed settings
+* Explore [API Documentation](api-reference.md) for integration
+* Check [Monitoring and Observability](monitoring.md) for production insights
 
 ```bash
 # Logrotate configuration
