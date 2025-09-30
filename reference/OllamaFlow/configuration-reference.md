@@ -1,8 +1,8 @@
 ---
 title: Configuration Reference
 excerpt: >-
-  This comprehensive guide covers all configuration options available in
-  OllamaFlow, including the main settings file (`ollamaflow.json`) and the
+  This comprehensive guide covers all configuration options available in  
+  OllamaFlow, including the main settings file (`ollamaflow.json`) and the  
   structure of key objects like frontends and backends.
 deprecated: false
 hidden: false
