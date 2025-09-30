@@ -6,11 +6,14 @@ hidden: false
 metadata:
   robots: index
 ---
+<br />
+
 ## Base URL and Authentication
 
 * **Base URL**: `http://your-ollamaflow-host:43411`
 * **Admin Authentication**: Bearer token required for administrative endpoints
 * **Ollama APIs**: No authentication required (proxied to backends)
+* **OpenAI APIs**: No authentication required (proxied to backends)
 
 ### Authentication Header
 
@@ -19,6 +22,10 @@ metadata:
 curl -H "Authorization: Bearer your-admin-token" \
   http://localhost:43411/v1.0/backends
 ```
+
+## API Compatibility
+
+OllamaFlow supports both Ollama and OpenAI-compatible API formats, allowing clients to use either API style without modification.
 
 ## Ollama-Compatible APIs
 
@@ -285,6 +292,169 @@ curl -X DELETE \
   http://localhost:43411/api/delete
 ```
 
+## OpenAI-Compatible APIs
+
+OllamaFlow also supports OpenAI-compatible API endpoints, allowing existing OpenAI clients and tools to work seamlessly.
+
+### Generate Completion
+
+Generate text completions using OpenAI-compatible format.
+
+**POST** `/v1/completions`
+
+#### Request Body
+
+```json
+{
+  "model": "llama3:8b",
+  "prompt": "Why is the sky blue?",
+  "max_tokens": 100,
+  "temperature": 0.8,
+  "top_p": 0.9,
+  "stream": false
+}
+```
+
+#### cURL Example
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama3:8b",
+    "prompt": "Explain quantum computing in simple terms",
+    "max_tokens": 200,
+    "temperature": 0.7,
+    "stream": false
+  }' \
+  http://localhost:43411/v1/completions
+```
+
+### Chat Completion
+
+Generate chat-style completions using OpenAI-compatible format.
+
+**POST** `/v1/chat/completions`
+
+#### Request Body
+
+```json
+{
+  "model": "llama3:8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful AI assistant."
+    },
+    {
+      "role": "user",
+      "content": "What is machine learning?"
+    }
+  ],
+  "max_tokens": 150,
+  "temperature": 0.8,
+  "stream": false
+}
+```
+
+#### cURL Example
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama3:8b",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant specializing in technology."
+      },
+      {
+        "role": "user",
+        "content": "Explain the difference between AI and ML"
+      }
+    ],
+    "max_tokens": 150,
+    "temperature": 0.7
+  }' \
+  http://localhost:43411/v1/chat/completions
+```
+
+### Generate Embeddings
+
+Generate embeddings using OpenAI-compatible format.
+
+**POST** `/v1/embeddings`
+
+#### Request Body
+
+```json
+{
+  "model": "nomic-embed-text",
+  "input": "The quick brown fox jumps over the lazy dog"
+}
+```
+
+#### cURL Example
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "nomic-embed-text",
+    "input": ["Hello world", "How are you?"]
+  }' \
+  http://localhost:43411/v1/embeddings
+```
+
+#### Response
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "object": "embedding",
+      "embedding": [0.1, 0.2, 0.3, ...],
+      "index": 0
+    }
+  ],
+  "model": "nomic-embed-text",
+  "usage": {
+    "prompt_tokens": 8,
+    "total_tokens": 8
+  }
+}
+```
+
+### List Models
+
+Get available models using OpenAI-compatible format.
+
+**GET** `/v1/models`
+
+#### cURL Example
+
+```bash
+curl http://localhost:43411/v1/models
+```
+
+#### Response
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "llama3:8b",
+      "object": "model",
+      "created": 1704067200,
+      "owned_by": "ollama"
+    }
+  ]
+}
+```
+
 ## Administrative APIs
 
 These endpoints provide cluster management capabilities and require bearer token authentication.
@@ -450,34 +620,44 @@ curl -H "Authorization: Bearer your-admin-token" \
 #### Response
 
 ```json
-{
-  "backends": [
-    {
-      "identifier": "gpu-1",
-      "name": "GPU Server 1",
-      "healthy": true,
-      "healthySinceUtc": "2024-01-15T09:00:00.000Z",
-      "unhealthySinceUtc": null,
-      "uptime": "01:30:45.123",
-      "activeRequests": 2,
-      "consecutiveSuccesses": 150,
-      "consecutiveFailures": 0,
-      "lastHealthCheck": "2024-01-15T10:30:00.000Z"
+[
+  {
+    "Identifier": "backend1",
+    "Name": "My localhost Ollama instance",
+    "Hostname": "localhost",
+    "Port": 11434,
+    "Ssl": false,
+    "UnhealthyThreshold": 2,
+    "HealthyThreshold": 2,
+    "HealthCheckMethod": {
+      "Method": "GET"
     },
-    {
-      "identifier": "gpu-2",
-      "name": "GPU Server 2",
-      "healthy": false,
-      "healthySinceUtc": null,
-      "unhealthySinceUtc": "2024-01-15T10:25:00.000Z",
-      "downtime": "00:05:00.000",
-      "activeRequests": 0,
-      "consecutiveSuccesses": 0,
-      "consecutiveFailures": 3,
-      "lastHealthCheck": "2024-01-15T10:30:00.000Z"
-    }
-  ]
-}
+    "HealthCheckUrl": "/",
+    "MaxParallelRequests": 4,
+    "RateLimitRequestsThreshold": 10,
+    "LogRequestFull": false,
+    "LogRequestBody": false,
+    "LogResponseBody": false,
+    "ApiFormat": "Ollama",
+    "PinnedEmbeddingsProperties": {},
+    "PinnedCompletionsProperties": {
+      "model": "qwen2.5:3b",
+      "options": {
+        "temperature": 0.1,
+        "howdy": "doody"
+      }
+    },
+    "AllowEmbeddings": true,
+    "AllowCompletions": true,
+    "Active": true,
+    "CreatedUtc": "2025-09-29T23:15:45.659639Z",
+    "LastUpdateUtc": "2025-09-29T23:19:07.346900Z",
+    "HealthySinceUtc": "2025-09-30T01:53:21.026058Z",
+    "Uptime": "00:25:52.4859452",
+    "ActiveRequests": 0,
+    "IsSticky": false
+  }
+]
 ```
 
 #### Get Single Backend Health
@@ -486,7 +666,48 @@ curl -H "Authorization: Bearer your-admin-token" \
 
 ```bash
 curl -H "Authorization: Bearer your-admin-token" \
-  http://localhost:43411/v1.0/backends/gpu-1/health
+  http://localhost:43411/v1.0/backends/backend1/health
+```
+
+#### Response
+
+```json
+{
+  "Identifier": "backend1",
+  "Name": "My localhost Ollama instance",
+  "Hostname": "localhost",
+  "Port": 11434,
+  "Ssl": false,
+  "UnhealthyThreshold": 2,
+  "HealthyThreshold": 2,
+  "HealthCheckMethod": {
+    "Method": "GET"
+  },
+  "HealthCheckUrl": "/",
+  "MaxParallelRequests": 4,
+  "RateLimitRequestsThreshold": 10,
+  "LogRequestFull": false,
+  "LogRequestBody": false,
+  "LogResponseBody": false,
+  "ApiFormat": "Ollama",
+  "PinnedEmbeddingsProperties": {},
+  "PinnedCompletionsProperties": {
+    "model": "qwen2.5:3b",
+    "options": {
+      "temperature": 0.1,
+      "howdy": "doody"
+    }
+  },
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "Active": true,
+  "CreatedUtc": "2025-09-29T23:15:45.659639Z",
+  "LastUpdateUtc": "2025-09-29T23:19:07.346900Z",
+  "HealthySinceUtc": "2025-09-30T01:53:21.026058Z",
+  "Uptime": "00:26:32.4690556",
+  "ActiveRequests": 0,
+  "IsSticky": false
+}
 ```
 
 ## Error Responses
@@ -580,9 +801,80 @@ The collection includes:
 * Environment variables for easy configuration
 * Response examples and test scripts
 
+## Security and Access Control
+
+OllamaFlow provides comprehensive security controls through Frontend and Backend configuration:
+
+### Request Type Controls
+
+* **AllowEmbeddings**: Controls access to embeddings endpoints
+  * Ollama API: `/api/embed`
+  * OpenAI API: `/v1/embeddings`
+* **AllowCompletions**: Controls access to completion endpoints
+  * Ollama API: `/api/generate`, `/api/chat`
+  * OpenAI API: `/v1/completions`, `/v1/chat/completions`
+
+For a request to succeed, both the frontend and at least one assigned backend must allow the request type.
+
+### Pinned Properties
+
+Administrators can enforce specific parameters in requests through pinned properties:
+
+* **PinnedEmbeddingsProperties**: Key-value pairs merged into all embeddings requests
+* **PinnedCompletionsProperties**: Key-value pairs merged into all completion requests
+
+Pinned properties take precedence over client-specified values, enabling organizational compliance and standardization.
+
+### Example Security Configuration
+
+```bash
+# Create a frontend that only allows completions with enforced temperature
+curl -X PUT \
+  -H "Authorization: Bearer your-admin-token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Identifier": "secure-frontend",
+    "Name": "Secure Completions Only",
+    "AllowEmbeddings": false,
+    "AllowCompletions": true,
+    "PinnedCompletionsProperties": {
+      "options": {
+        "temperature": 0.7,
+        "num_ctx": 2048
+      }
+    },
+    "Backends": ["secure-backend"]
+  }' \
+  http://localhost:43411/v1.0/frontends
+```
+
+With this configuration:
+
+* ✅ **Allowed**: Completion requests to both API formats
+  * `POST /api/generate` (Ollama)
+  * `POST /api/chat` (Ollama)
+  * `POST /v1/completions` (OpenAI)
+  * `POST /v1/chat/completions` (OpenAI)
+* ❌ **Blocked**: Embeddings requests to both API formats
+  * `POST /api/embed` (Ollama)
+  * `POST /v1/embeddings` (OpenAI)
+
+## API Explorer
+
+OllamaFlow includes a companion web-based API Explorer for testing and validation:
+
+* **Repository**: [https://github.com/ollamaflow/apiexplorer](https://github.com/ollamaflow/apiexplorer)
+* **Purpose**: Test and evaluate APIs in scaled inference architectures
+* **Features**: Real-time API testing, JSON validation, response inspection
+* **Formats**: Supports both Ollama and OpenAI API formats
+
+The API Explorer provides an intuitive interface for development debugging, load testing, and integration validation.
+
 ## SDK and Client Libraries
 
-OllamaFlow is compatible with existing Ollama client libraries:
+OllamaFlow supports both Ollama and OpenAI client libraries:
+
+### Ollama-Compatible Libraries
 
 * **Python**: `ollama-python`
 * **JavaScript**: `ollama-js`
@@ -590,8 +882,18 @@ OllamaFlow is compatible with existing Ollama client libraries:
 * **Rust**: `ollama-rs`
 * **Java**: `ollama-java`
 
-Simply point these libraries to your OllamaFlow endpoint instead of a direct Ollama instance.
+### OpenAI-Compatible Libraries
 
-## User Interface
+* **Python**: `openai` (official OpenAI Python library)
+* **JavaScript**: `openai` (official OpenAI Node.js library)
+* **Go**: `go-openai`
+* **Rust**: `async-openai`
+* **Java**: `openai-java`
 
-Download the web user interface for OllamaFlow [here](https://github.com/ollamaflow/ui) .
+Simply point these libraries to your OllamaFlow endpoint instead of a direct Ollama or OpenAI instance. For OpenAI libraries, use the base URL `http://your-ollamaflow-host:43411/v1`.
+
+## Next Steps
+
+* Explore [Configuration Examples](configuration-examples.md) for common scenarios
+* Review [REST API Basics](rest-api-basics.md) for API fundamentals
+* Check [Monitoring and Observability](monitoring.md) for production insights
