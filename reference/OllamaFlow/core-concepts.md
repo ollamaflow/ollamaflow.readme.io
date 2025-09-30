@@ -9,26 +9,28 @@ hidden: false
 metadata:
   robots: index
 ---
-<br />
-
 ## Frontends
 
 A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends define how requests are routed and which backends serve those requests.
 
 ### Frontend Properties
 
-| Property                    | Description                          | Default             |
-| --------------------------- | ------------------------------------ | ------------------- |
-| `Identifier`                | Unique identifier for the frontend   | Required            |
-| `Name`                      | Human-readable name                  | Required            |
-| `Hostname`                  | Hostname pattern (`*` for catch-all) | `*`                 |
-| `TimeoutMs`                 | Request timeout in milliseconds      | `60000`             |
-| `LoadBalancing`             | Load balancing algorithm             | `RoundRobin`        |
-| `Backends`                  | List of backend identifiers to use   | `[]`                |
-| `RequiredModels`            | Models that must be available        | `[]`                |
-| `MaxRequestBodySize`        | Maximum request size in bytes        | `536870912` (512MB) |
-| `UseStickySessions`         | Enable session stickiness            | `false`             |
-| `StickySessionExpirationMs` | Session timeout in milliseconds      | `1800000` (30 min)  |
+| Property                      | Description                            | Default             |
+| ----------------------------- | -------------------------------------- | ------------------- |
+| `Identifier`                  | Unique identifier for the frontend     | Required            |
+| `Name`                        | Human-readable name                    | Required            |
+| `Hostname`                    | Hostname pattern (`*` for catch-all)   | `*`                 |
+| `TimeoutMs`                   | Request timeout in milliseconds        | `60000`             |
+| `LoadBalancing`               | Load balancing algorithm               | `RoundRobin`        |
+| `Backends`                    | List of backend identifiers to use     | `[]`                |
+| `RequiredModels`              | Models that must be available          | `[]`                |
+| `AllowEmbeddings`             | Allow embeddings API requests          | `true`              |
+| `AllowCompletions`            | Allow completions API requests         | `true`              |
+| `PinnedEmbeddingsProperties`  | Enforce specific embeddings parameters | `{}`                |
+| `PinnedCompletionsProperties` | Enforce specific completion parameters | `{}`                |
+| `MaxRequestBodySize`          | Maximum request size in bytes          | `536870912` (512MB) |
+| `UseStickySessions`           | Enable session stickiness              | `false`             |
+| `StickySessionExpirationMs`   | Session timeout in milliseconds        | `1800000` (30 min)  |
 
 ### Load Balancing Algorithms
 
@@ -74,6 +76,36 @@ A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends d
 * Backend failures invalidate all associated sessions
 * Sessions are not persisted across OllamaFlow restarts
 
+### Security Controls
+
+Frontend security controls enable fine-grained access control and request parameter enforcement:
+
+#### Request Type Controls
+
+* **`AllowEmbeddings`**: Controls whether embeddings API endpoints are accessible through this frontend
+  * Ollama API: `/api/embed`
+  * OpenAI API: `/v1/embeddings`
+* **`AllowCompletions`**: Controls whether completion API endpoints are accessible through this frontend
+  * Ollama API: `/api/generate`, `/api/chat`
+  * OpenAI API: `/v1/completions`, `/v1/chat/completions`
+
+For a request to succeed, both the frontend and at least one assigned backend must allow the request type.
+
+#### Pinned Properties
+
+Pinned properties allow administrators to enforce specific parameters in requests:
+
+* **`PinnedEmbeddingsProperties`**: Key-value pairs automatically merged into all embeddings requests
+* **`PinnedCompletionsProperties`**: Key-value pairs automatically merged into all completion requests
+
+Common use cases:
+
+* Enforce maximum context size: `{"options": {"num_ctx": 2048}}`
+* Standardize temperature settings: `{"options": {"temperature": 0.7}}`
+* Override model selection: `{"model": "approved-model:latest"}`
+
+Properties are merged with client requests, with pinned properties taking precedence over client-specified values.
+
 ### Frontend Configuration Example
 
 ```json
@@ -85,6 +117,20 @@ A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends d
   "TimeoutMs": 90000,
   "Backends": ["gpu-1", "gpu-2", "gpu-3"],
   "RequiredModels": ["llama3:8b", "mistral:7b", "codellama"],
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "model": "nomic-embed-text",
+    "options": {
+      "temperature": 0.1
+    }
+  },
+  "PinnedCompletionsProperties": {
+    "options": {
+      "temperature": 0.7,
+      "num_ctx": 2048
+    }
+  },
   "MaxRequestBodySize": 1073741824,
   "UseStickySessions": true,
   "StickySessionExpirationMs": 3600000
@@ -97,19 +143,23 @@ A **Backend** represents a physical Ollama instance in your infrastructure. Back
 
 ### Backend Properties
 
-| Property                     | Description                              | Default  |
-| ---------------------------- | ---------------------------------------- | -------- |
-| `Identifier`                 | Unique identifier for the backend        | Required |
-| `Name`                       | Human-readable name                      | Required |
-| `Hostname`                   | Ollama server hostname/IP                | Required |
-| `Port`                       | Ollama server port                       | `11434`  |
-| `Ssl`                        | Enable HTTPS for backend communication   | `false`  |
-| `HealthCheckUrl`             | URL path for health checks               | `/`      |
-| `HealthCheckMethod`          | HTTP method for health checks            | `GET`    |
-| `UnhealthyThreshold`         | Failed checks before marking unhealthy   | `2`      |
-| `HealthyThreshold`           | Successful checks before marking healthy | `2`      |
-| `MaxParallelRequests`        | Maximum concurrent requests              | `4`      |
-| `RateLimitRequestsThreshold` | Rate limiting threshold                  | `10`     |
+| Property                      | Description                              | Default  |
+| ----------------------------- | ---------------------------------------- | -------- |
+| `Identifier`                  | Unique identifier for the backend        | Required |
+| `Name`                        | Human-readable name                      | Required |
+| `Hostname`                    | Ollama server hostname/IP                | Required |
+| `Port`                        | Ollama server port                       | `11434`  |
+| `Ssl`                         | Enable HTTPS for backend communication   | `false`  |
+| `HealthCheckUrl`              | URL path for health checks               | `/`      |
+| `HealthCheckMethod`           | HTTP method for health checks            | `GET`    |
+| `UnhealthyThreshold`          | Failed checks before marking unhealthy   | `2`      |
+| `HealthyThreshold`            | Successful checks before marking healthy | `2`      |
+| `MaxParallelRequests`         | Maximum concurrent requests              | `4`      |
+| `RateLimitRequestsThreshold`  | Rate limiting threshold                  | `10`     |
+| `AllowEmbeddings`             | Allow embeddings API requests            | `true`   |
+| `AllowCompletions`            | Allow completions API requests           | `true`   |
+| `PinnedEmbeddingsProperties`  | Enforce specific embeddings parameters   | `{}`     |
+| `PinnedCompletionsProperties` | Enforce specific completion parameters   | `{}`     |
 
 ### Health Monitoring
 
@@ -139,7 +189,20 @@ OllamaFlow continuously monitors backend health:
   "UnhealthyThreshold": 3,
   "HealthyThreshold": 2,
   "MaxParallelRequests": 8,
-  "RateLimitRequestsThreshold": 20
+  "RateLimitRequestsThreshold": 20,
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "options": {
+      "num_ctx": 512
+    }
+  },
+  "PinnedCompletionsProperties": {
+    "options": {
+      "num_ctx": 4096,
+      "temperature": 0.8
+    }
+  }
 }
 ```
 
