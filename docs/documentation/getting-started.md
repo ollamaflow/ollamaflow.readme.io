@@ -31,6 +31,9 @@ Virtual Ollama endpoints that clients connect to. Each frontend:
 * Defines which backend Ollama instances to use
 * Specifies required models for automatic synchronization
 * Configures load balancing behavior and request handling
+* **Controls API access** with `AllowEmbeddings` and `AllowCompletions` properties
+* **Enforces parameters** through `PinnedEmbeddingsProperties` and `PinnedCompletionsProperties`
+* **Supports both API formats**: Ollama (`/api/*`) and OpenAI (`/v1/*`) compatible endpoints
 
 ### 2. **Backends**
 
@@ -40,6 +43,9 @@ Physical Ollama instances in your infrastructure. Each backend:
 * Has configurable health check parameters
 * Supports request rate limiting and parallel request management
 * Maintains model discovery and availability tracking
+* **Controls request types** with `AllowEmbeddings` and `AllowCompletions` properties
+* **Enforces server-specific parameters** through pinned properties
+* **Supports API isolation** for dedicated embeddings or completions servers
 
 ### 3. **Models**
 
@@ -67,12 +73,53 @@ Smart load balancing and model synchronization optimize resource utilization acr
 
 Bearer token authentication, comprehensive logging, and RESTful administration APIs provide the management capabilities needed for production deployments.
 
+### **Advanced Security Controls**
+
+Fine-grained access control through request type restrictions and parameter enforcement ensures organizational compliance and security standards.
+
+## Security Features
+
+OllamaFlow provides comprehensive security controls for enterprise deployments:
+
+### **Request Type Controls**
+
+Control which API endpoints are accessible through each frontend and backend:
+
+* **`AllowEmbeddings`**: Enable/disable access to embeddings APIs (`/api/embed`, `/v1/embeddings`)
+* **`AllowCompletions`**: Enable/disable access to completion APIs (`/api/generate`, `/api/chat`, `/v1/completions`, `/v1/chat/completions`)
+
+Both frontend and backend must allow a request type for it to succeed, enabling layered security controls.
+
+### **Parameter Enforcement**
+
+Ensure consistent and compliant API usage through pinned properties:
+
+* **`PinnedEmbeddingsProperties`**: Automatically merge specific parameters into all embeddings requests
+* **`PinnedCompletionsProperties`**: Automatically merge specific parameters into all completion requests
+
+Common enforcement scenarios:
+* Force specific models: `{"model": "approved-model:latest"}`
+* Limit context size: `{"options": {"num_ctx": 2048}}`
+* Standardize temperature: `{"options": {"temperature": 0.7}}`
+* Set organizational defaults for consistency
+
+### **Multi-Layer Security**
+
+Properties are merged in order: Client Request → Frontend Pinned Properties → Backend Pinned Properties, with later values taking precedence. This allows for:
+
+* **Organization-wide defaults** at the frontend level
+* **Hardware-specific optimizations** at the backend level
+* **Layered compliance** ensuring all requests meet standards
+
 ## Use Cases
 
 * **GPU Cluster Management**: Distribute workloads across multiple GPU servers
 * **High Availability AI Services**: Ensure 24/7 availability with automatic failover
 * **Development & Testing**: Easy switching between different model configurations
 * **Multi-Tenant Scenarios**: Isolate workloads while sharing infrastructure
+* **Security Compliance**: Control API access and enforce organizational parameter standards
+* **Dedicated Service Isolation**: Separate embeddings and completions workloads across different servers
+* **Parameter Standardization**: Enforce consistent temperature, context size, and model configurations
 * **Cost Optimization**: Maximize hardware utilization across your AI infrastructure
 
 ## API Explorer
