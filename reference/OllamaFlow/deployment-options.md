@@ -28,48 +28,6 @@ docker run -d \
   jchristn/ollamaflow:v1.1.0
 ```
 
-### Production Container Setup
-
-For production environments, use external volumes and custom configuration:
-
-```bash
-# Create directories
-mkdir -p /opt/ollamaflow/{data,logs}
-
-# Create production configuration
-cat > /opt/ollamaflow/ollamaflow.json << 'EOF'
-{
-  "Webserver": {
-    "Hostname": "*",
-    "Port": 43411,
-    "Ssl": {
-      "Enable": false
-    }
-  },
-  "Logging": {
-    "LogDirectory": "/app/logs/",
-    "LogFilename": "ollamaflow.log",
-    "ConsoleLogging": true,
-    "MinimumSeverity": "Info"
-  },
-  "DatabaseFilename": "/app/data/ollamaflow.db",
-  "AdminBearerTokens": [
-    "your-secure-production-token-here"
-  ]
-}
-EOF
-
-# Run with production configuration
-docker run -d \
-  --name ollamaflow \
-  --restart unless-stopped \
-  -p 43411:43411 \
-  -v /opt/ollamaflow/ollamaflow.json:/app/ollamaflow.json:ro \
-  -v /opt/ollamaflow/data:/app/data \
-  -v /opt/ollamaflow/logs:/app/logs \
-  jchristn/ollamaflow
-```
-
 ### Docker Compose
 
 For complex deployments, use Docker Compose:
@@ -80,17 +38,15 @@ version: '3.8'
 
 services:
   ollamaflow:
-    image: jchristn/ollamaflow:latest
+    image: jchristn/ollamaflow:v1.1.0
     container_name: ollamaflow
     restart: unless-stopped
     ports:
       - "43411:43411"
     volumes:
       - ./ollamaflow.json:/app/ollamaflow.json:ro
-      - ./data:/app/data
+      - ./ollamaflow.db:/app/ollamaflow.db
       - ./logs:/app/logs
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:43411/"]
       interval: 30s
