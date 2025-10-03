@@ -68,21 +68,7 @@ docker-compose logs -f ollamaflow
 docker-compose down
 ```
 
-## Bare Metal Deployment
-
-Deploy directly on servers for maximum performance and control.
-
-### System Requirements
-
-* **Operating System**: Linux, Windows, or macOS
-* **.NET Runtime**: .NET 8.0 or later
-* **Memory**: Minimum 512MB RAM, 2GB+ recommended
-* **Storage**: 100MB for application, additional space for logs and database
-* **Network**: Connectivity to Ollama instances
-
-### Installation Steps
-
-#### Download and Install
+<br />
 
 ```bash
 # Download the latest release (replace with actual release URL)
@@ -100,77 +86,6 @@ sudo chown -R ollamaflow:ollamaflow /opt/ollamaflow
 sudo chmod +x /opt/ollamaflow/OllamaFlow.Server
 ```
 
-#### Configuration
-
-```bash
-# Create configuration directory
-sudo mkdir -p /etc/ollamaflow
-
-# Create production configuration
-sudo tee /etc/ollamaflow/ollamaflow.json > /dev/null << 'EOF'
-{
-  "Webserver": {
-    "Hostname": "*",
-    "Port": 43411
-  },
-  "Logging": {
-    "LogDirectory": "/var/log/ollamaflow/",
-    "LogFilename": "ollamaflow.log",
-    "ConsoleLogging": false,
-    "MinimumSeverity": "Info"
-  },
-  "DatabaseFilename": "/var/lib/ollamaflow/ollamaflow.db",
-  "AdminBearerTokens": [
-    "your-secure-production-token"
-  ]
-}
-EOF
-
-# Create data and log directories
-sudo mkdir -p /var/lib/ollamaflow /var/log/ollamaflow
-sudo chown ollamaflow:ollamaflow /var/lib/ollamaflow /var/log/ollamaflow
-```
-
-#### Systemd Service
-
-Create a systemd service for automatic startup:
-
-```bash
-# Create service file
-sudo tee /etc/systemd/system/ollamaflow.service > /dev/null << 'EOF'
-[Unit]
-Description=OllamaFlow AI Load Balancer
-After=network.target
-Wants=network.target
-
-[Service]
-Type=exec
-User=ollamaflow
-Group=ollamaflow
-WorkingDirectory=/opt/ollamaflow
-ExecStart=/opt/ollamaflow/OllamaFlow.Server
-Environment=OLLAMAFLOW_CONFIG=/etc/ollamaflow/ollamaflow.json
-Restart=always
-RestartSec=10
-SyslogIdentifier=ollamaflow
-
-# Resource limits
-LimitNOFILE=65536
-LimitNPROC=32768
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start service
-sudo systemctl daemon-reload
-sudo systemctl enable ollamaflow
-sudo systemctl start ollamaflow
-
-# Check status
-sudo systemctl status ollamaflow
-```
-
 ## Source Code Deployment
 
 Deploy from source for development or customization.
@@ -184,7 +99,7 @@ Deploy from source for development or customization.
 
 ```bash
 # Clone repository
-git clone https://github.com/jchristn/ollamaflow.git
+git clone https://github.com/ollamaflow/ollamaflow.git
 cd ollamaflow
 
 # Build release version
