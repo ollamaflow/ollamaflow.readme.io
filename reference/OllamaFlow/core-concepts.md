@@ -184,7 +184,7 @@ OllamaFlow continuously monitors backend health:
   "Hostname": "192.168.1.100",
   "Port": 11434,
   "Ssl": false,
-  "HealthCheckUrl": "/api/version",
+  "HealthCheckUrl": "/",
   "HealthCheckMethod": "GET",
   "UnhealthyThreshold": 3,
   "HealthyThreshold": 2,
