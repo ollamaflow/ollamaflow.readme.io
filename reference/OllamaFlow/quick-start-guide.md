@@ -24,49 +24,15 @@ The fastest way to get started is using the official Docker image.
 
 ```bash
 # Pull the latest image
-docker pull jchristn/ollamaflow
+docker pull jchristn/ollamaflow:v1.1.0
 
 # Run with default configuration and persistent data
 docker run -d \
   --name ollamaflow \
   -p 43411:43411 \
-  -v $(pwd)/ollamaflow-data:/app/data \
-  jchristn/ollamaflow
-```
-
-### Custom Configuration
-
-Create a configuration file to customize OllamaFlow behavior:
-
-```bash
-# Create data directory
-mkdir -p ollamaflow-data
-
-# Create configuration file
-cat > ollamaflow.json << 'EOF'
-{
-  "Webserver": {
-    "Hostname": "*",
-    "Port": 43411
-  },
-  "Logging": {
-    "MinimumSeverity": "Info",
-    "ConsoleLogging": true
-  },
-  "DatabaseFilename": "/app/data/ollamaflow.db",
-  "AdminBearerTokens": [
-    "your-secure-admin-token"
-  ]
-}
-EOF
-
-# Run with custom configuration and persistent database
-docker run -d \
-  --name ollamaflow \
-  -p 43411:43411 \
   -v $(pwd)/ollamaflow.json:/app/ollamaflow.json:ro \
-  -v $(pwd)/ollamaflow-data:/app/data \
-  jchristn/ollamaflow
+  -v $(pwd)/ollamaflow.db:/app/ollamaflow.db \
+  jchristn/ollamaflow:v1.1.0
 ```
 
 ## Option 2: Build from Source
