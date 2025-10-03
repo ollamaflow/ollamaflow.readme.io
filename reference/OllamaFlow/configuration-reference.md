@@ -17,7 +17,6 @@ OllamaFlow uses a JSON configuration file (`ollamaflow.json`) that defines serve
 
 * **Docker**: `/app/ollamaflow.json`
 * **Bare Metal**: Same directory as executable
-* **Custom**: Specify with `OLLAMAFLOW_CONFIG` environment variable
 
 ### Complete Configuration Example
 
@@ -328,7 +327,7 @@ Backends represent physical Ollama instances in your infrastructure.
   "UnhealthyThreshold": 3,
   "HealthyThreshold": 2,
   "HealthCheckMethod": "GET",
-  "HealthCheckUrl": "/api/version",
+  "HealthCheckUrl": "/",
   "MaxParallelRequests": 8,
   "RateLimitRequestsThreshold": 20,
   "AllowEmbeddings": true,
@@ -353,41 +352,40 @@ Backends represent physical Ollama instances in your infrastructure.
 
 ### Backend Properties
 
-| Property                      | Type    | Default  | Description                                      |
-| ----------------------------- | ------- | -------- | ------------------------------------------------ |
-| `Identifier`                  | string  | Required | Unique identifier for this backend               |
-| `Name`                        | string  | Required | Human-readable name                              |
-| `Hostname`                    | string  | Required | Backend server hostname/IP                       |
-| `Port`                        | integer | `11434`  | Backend server port                              |
-| `Ssl`                         | boolean | `false`  | Use HTTPS for backend communication              |
-| `UnhealthyThreshold`          | integer | `2`      | Failed checks before marking unhealthy           |
-| `HealthyThreshold`            | integer | `2`      | Successful checks before marking healthy         |
-| `HealthCheckMethod`           | string  | `"GET"`  | HTTP method for health checks                    |
-| `HealthCheckUrl`              | string  | `"/"`    | URL path for health checks                       |
-| `MaxParallelRequests`         | integer | `4`      | Maximum concurrent requests                      |
-| `RateLimitRequestsThreshold`  | integer | `10`     | Rate limiting threshold                          |
-| `AllowEmbeddings`             | boolean | `true`   | Allow embeddings API requests                    |
-| `AllowCompletions`            | boolean | `true`   | Allow completions API requests                   |
-| `PinnedEmbeddingsProperties`  | object  | `{}`     | Key-value pairs merged into embeddings requests  |
-| `PinnedCompletionsProperties` | object  | `{}`     | Key-value pairs merged into completions requests |
-| `LogRequestFull`              | boolean | `false`  | Log complete requests                            |
-| `LogRequestBody`              | boolean | `false`  | Log request bodies                               |
-| `LogResponseBody`             | boolean | `false`  | Log response bodies                              |
-| `Active`                      | boolean | `true`   | Whether backend is active                        |
+| Property                      | Type    | Default  | Description                                           |
+| ----------------------------- | ------- | -------- | ----------------------------------------------------- |
+| `Identifier`                  | string  | Required | Unique identifier for this backend                    |
+| `Name`                        | string  | Required | Human-readable name                                   |
+| `Hostname`                    | string  | Required | Backend server hostname/IP                            |
+| `Port`                        | integer | `11434`  | Backend server port                                   |
+| `Ssl`                         | boolean | `false`  | Use HTTPS for backend communication                   |
+| `UnhealthyThreshold`          | integer | `2`      | Failed checks before marking unhealthy                |
+| `HealthyThreshold`            | integer | `2`      | Successful checks before marking healthy              |
+| `HealthCheckMethod`           | string  | `"GET"`  | HTTP method for health checks, either `GET` or `HEAD` |
+| `HealthCheckUrl`              | string  | `"/"`    | URL path for health checks                            |
+| `MaxParallelRequests`         | integer | `4`      | Maximum concurrent requests                           |
+| `RateLimitRequestsThreshold`  | integer | `10`     | Rate limiting threshold                               |
+| `AllowEmbeddings`             | boolean | `true`   | Allow embeddings API requests                         |
+| `AllowCompletions`            | boolean | `true`   | Allow completions API requests                        |
+| `PinnedEmbeddingsProperties`  | object  | `{}`     | Key-value pairs merged into embeddings requests       |
+| `PinnedCompletionsProperties` | object  | `{}`     | Key-value pairs merged into completions requests      |
+| `LogRequestFull`              | boolean | `false`  | Log complete requests                                 |
+| `LogRequestBody`              | boolean | `false`  | Log request bodies                                    |
+| `LogResponseBody`             | boolean | `false`  | Log response bodies                                   |
+| `Active`                      | boolean | `true`   | Whether backend is active                             |
 
 ### Health Check Configuration
 
 Health checks validate backend availability:
 
-* **Method**: HTTP method (GET, HEAD, POST)
+* **Method**: HTTP method (`GET`, `HEAD`)
 * **URL**: Path to check (e.g., `/`, `/api/version`, `/health`)
 * **Thresholds**: Number of consecutive successes/failures to change state
 
 Common health check endpoints:
 
-* `/`: Basic connectivity check
-* `/api/version`: Ollama version endpoint
-* `/api/tags`: Model listing endpoint
+* `HEAD /`: Basic connectivity check for Ollama
+* `GET /health`: Basic connectivity check for vLLM
 
 ### Rate Limiting
 
@@ -431,20 +429,7 @@ Backend pinned properties are merged after frontend pinned properties, allowing 
 
 The merge order is: Client Request → Frontend Pinned Properties → Backend Pinned Properties, with later values taking precedence.
 
-## Environment Variables
-
-Override configuration with environment variables:
-
-| Variable                 | Description                 | Example                       |
-| ------------------------ | --------------------------- | ----------------------------- |
-| `OLLAMAFLOW_CONFIG`      | Configuration file path     | `/etc/ollamaflow/config.json` |
-| `OLLAMAFLOW_PORT`        | Override webserver port     | `8080`                        |
-| `OLLAMAFLOW_HOSTNAME`    | Override webserver hostname | `0.0.0.0`                     |
-| `OLLAMAFLOW_DATABASE`    | Override database file path | `/data/ollamaflow.db`         |
-| `OLLAMAFLOW_ADMIN_TOKEN` | Override admin token        | `secure-production-token`     |
-| `ASPNETCORE_ENVIRONMENT` | .NET environment            | `Production`                  |
-
-### Docker Environment Example
+<br />
 
 ```bash
 docker run -d \
