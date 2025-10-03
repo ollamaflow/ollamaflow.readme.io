@@ -118,15 +118,8 @@ sudo chown -R ollamaflow:ollamaflow /opt/ollamaflow
 For development environments:
 
 ```bash
-# Navigate to source directory
 cd src/OllamaFlow.Server
-
-# Run in development mode
-export ASPNETCORE_ENVIRONMENT=Development
 dotnet run
-
-# Or with custom configuration
-dotnet run --configuration Debug
 ```
 
 ## Kubernetes Deployment
@@ -155,7 +148,7 @@ spec:
     spec:
       containers:
       - name: ollamaflow
-        image: jchristn/ollamaflow:latest
+        image: jchristn/ollamaflow:v1.1.0
         ports:
         - containerPort: 43411
         env:
@@ -166,8 +159,10 @@ spec:
           mountPath: /app/ollamaflow.json
           subPath: ollamaflow.json
           readOnly: true
-        - name: data
-          mountPath: /app/data
+        - name: database
+          mountPath: /app/ollamaflow.db
+          subPath: ollamaflow.db
+          readOnly: false
         resources:
           requests:
             memory: "256Mi"
