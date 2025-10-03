@@ -53,10 +53,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-volumes:
-  data:
-  logs:
 ```
 
 Deploy with:
