@@ -1,13 +1,11 @@
 ---
 title: API Reference
-excerpt: '  OllamaFlow provides three sets of APIs: **Ollama-compatible APIs** and   **OpenAI-compatible APIs** for AI inference, plus **Administrative APIs** for   cluster management. All APIs support JSON request/response format and maintain   full compatibility with existing Ollama and OpenAI clients.'
+excerpt: '  OllamaFlow provides three sets of APIs: **Ollama-compatible APIs** and **OpenAI-compatible APIs** for AI inference, plus **Administrative APIs** for cluster management. All APIs support JSON request/response format and maintain full compatibility with existing Ollama and OpenAI clients.'
 deprecated: false
 hidden: false
 metadata:
   robots: index
 ---
-<br />
-
 ## Base URL and Authentication
 
 * **Base URL**: `http://your-ollamaflow-host:43411`
