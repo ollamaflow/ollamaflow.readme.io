@@ -46,7 +46,7 @@ services:
     volumes:
       - ./ollamaflow.json:/app/ollamaflow.json:ro
       - ./ollamaflow.db:/app/ollamaflow.db
-      - ./logs:/app/logs
+      - ./logs/:/app/logs/
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:43411/"]
       interval: 30s
