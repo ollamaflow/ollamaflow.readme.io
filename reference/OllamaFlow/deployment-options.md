@@ -23,8 +23,9 @@ docker run -d \
   --name ollamaflow \
   --restart unless-stopped \
   -p 43411:43411 \
-  -v /opt/ollamaflow/data:/app/data \
-  jchristn/ollamaflow
+  -v /opt/ollamaflow/ollamaflow.json:/app/ollamaflow.json \
+  -v /opt/ollamaflow/ollamaflow.db:/app/ollamaflow.db \
+  jchristn/ollamaflow:v1.1.0
 ```
 
 ### Production Container Setup
