@@ -48,6 +48,7 @@ Physical Ollama instances in your infrastructure. Each backend:
 * Maintains model discovery and availability tracking
 * **Controls request types** with `AllowEmbeddings` and `AllowCompletions` properties
 * **Enforces server-specific parameters** through pinned properties
+* **Influences load-balancing and node selection** using `Labels`
 * **Supports API isolation** for dedicated embeddings or completions servers
 
 ### 3. **Models**
