@@ -143,23 +143,24 @@ A **Backend** represents a physical Ollama instance in your infrastructure. Back
 
 ### Backend Properties
 
-| Property                      | Description                                           | Default  |
-| ----------------------------- | ----------------------------------------------------- | -------- |
-| `Identifier`                  | Unique identifier for the backend                     | Required |
-| `Name`                        | Human-readable name                                   | Required |
-| `Hostname`                    | Ollama server hostname/IP                             | Required |
-| `Port`                        | Ollama server port                                    | `11434`  |
-| `Ssl`                         | Enable HTTPS for backend communication                | `false`  |
-| `HealthCheckUrl`              | URL path for health checks                            | `/`      |
-| `HealthCheckMethod`           | HTTP method for health checks, either `GET` or `HEAD` | `GET`    |
-| `UnhealthyThreshold`          | Failed checks before marking unhealthy                | `2`      |
-| `HealthyThreshold`            | Successful checks before marking healthy              | `2`      |
-| `MaxParallelRequests`         | Maximum concurrent requests                           | `4`      |
-| `RateLimitRequestsThreshold`  | Rate limiting threshold                               | `10`     |
-| `AllowEmbeddings`             | Allow embeddings API requests                         | `true`   |
-| `AllowCompletions`            | Allow completions API requests                        | `true`   |
-| `PinnedEmbeddingsProperties`  | Enforce specific embeddings parameters                | `{}`     |
-| `PinnedCompletionsProperties` | Enforce specific completion parameters                | `{}`     |
+| Property                      | Description                                               | Default  |
+| ----------------------------- | --------------------------------------------------------- | -------- |
+| `Identifier`                  | Unique identifier for the backend                         | Required |
+| `Name`                        | Human-readable name                                       | Required |
+| `Hostname`                    | Ollama server hostname/IP                                 | Required |
+| `Port`                        | Ollama server port                                        | `11434`  |
+| `Ssl`                         | Enable HTTPS for backend communication                    | `false`  |
+| `HealthCheckUrl`              | URL path for health checks                                | `/`      |
+| `HealthCheckMethod`           | HTTP method for health checks, either `GET` or `HEAD`     | `GET`    |
+| `UnhealthyThreshold`          | Failed checks before marking unhealthy                    | `2`      |
+| `HealthyThreshold`            | Successful checks before marking healthy                  | `2`      |
+| `MaxParallelRequests`         | Maximum concurrent requests                               | `4`      |
+| `RateLimitRequestsThreshold`  | Rate limiting threshold                                   | `10`     |
+| `AllowEmbeddings`             | Allow embeddings API requests                             | `true`   |
+| `AllowCompletions`            | Allow completions API requests                            | `true`   |
+| `Labels`                      | Specify labels to influence backend selection and routing | `[]`     |
+| `PinnedEmbeddingsProperties`  | Enforce specific embeddings parameters                    | `{}`     |
+| `PinnedCompletionsProperties` | Enforce specific completion parameters                    | `{}`     |
 
 ### Health Monitoring
 
@@ -192,6 +193,10 @@ OllamaFlow continuously monitors backend health:
   "RateLimitRequestsThreshold": 20,
   "AllowEmbeddings": true,
   "AllowCompletions": true,
+  "Labels": [
+    "europe",
+    "gdpr"
+  ],
   "PinnedEmbeddingsProperties": {
     "options": {
       "num_ctx": 512
