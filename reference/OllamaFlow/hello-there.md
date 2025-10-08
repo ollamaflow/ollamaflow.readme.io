@@ -79,7 +79,7 @@ Bearer token authentication, comprehensive logging, and RESTful administration A
 
 ### **Advanced Security Controls**
 
-Fine-grained access control through request type restrictions and parameter enforcement ensures organizational compliance and security standards.
+Fine-grained access control through request type restrictions, parameter enforcement, and label-based backend selection to ensure organizational compliance and security standards.
 
 ## Security Features
 
@@ -107,6 +107,10 @@ Common enforcement scenarios:
 * Limit context size: `{"options": {"num_ctx": 2048}}`
 * Standardize temperature: `{"options": {"temperature": 0.7}}`
 * Set organizational defaults for consistency
+
+### **Label-Based Control**
+
+Attached `Labels` to backend nodes, i.e. `"Labels": [ "europe" ]` to control which nodes are candidates to service a request when API requests include the `X-OllamaFlow-Label` header.  For example, ensure GDPR in-scope requests are only serviced by backends that have the label `europe` or `gdpr`.  Labels are unmanaged strings and semantic meaning is defined by the operator.
 
 ### **Multi-Layer Security**
 
