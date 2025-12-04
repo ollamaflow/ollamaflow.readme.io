@@ -313,7 +313,7 @@ Properties are merged with client requests, with pinned properties taking preced
 
 ## Backend Configuration
 
-Backends represent physical Ollama instances in your infrastructure.
+Backends represent physical Ollama instances in your infrastructure. 
 
 ### Backend Object Structure
 
