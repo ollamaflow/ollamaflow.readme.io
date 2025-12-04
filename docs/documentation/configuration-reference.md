@@ -446,7 +446,7 @@ Backends support additional request customization options for communicating with
   - Azure OpenAI Service authentication
   - Custom inference endpoints with bearer authentication
 
-* **`Querystring`**: If set, the specified querystring is appended to all URLs when communicating with this backend. Should not include the leading `?`. Useful for:
+* **`Querystring`**: If set, the specified querystring is appended to all URLs when communicating with this backend. Do not include the leading `?` character. Separate multiple key-value pairs with ampersands (e.g., `foo=bar&key=val`). Useful for:
   - API versioning: `api-version=2024-01`
   - Deployment targeting: `deployment=gpt-4`
   - Custom routing parameters

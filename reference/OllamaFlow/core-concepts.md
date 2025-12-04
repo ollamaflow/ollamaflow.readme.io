@@ -161,6 +161,9 @@ A **Backend** represents a physical Ollama instance in your infrastructure. Back
 | `Labels`                      | Specify labels to influence backend selection and routing | `[]`     |
 | `PinnedEmbeddingsProperties`  | Enforce specific embeddings parameters                    | `{}`     |
 | `PinnedCompletionsProperties` | Enforce specific completion parameters                    | `{}`     |
+| `BearerToken`                 | Bearer token for Authorization header                     | `null`   |
+| `Querystring`                 | Querystring appended to backend URLs                      | `null`   |
+| `Headers`                     | Custom headers added to backend requests                  | `{}`     |
 
 ### Health Monitoring
 
@@ -197,6 +200,9 @@ OllamaFlow continuously monitors backend health:
     "europe",
     "gdpr"
   ],
+  "BearerToken": null,
+  "Querystring": null,
+  "Headers": {},
   "PinnedEmbeddingsProperties": {
     "options": {
       "num_ctx": 512
@@ -207,6 +213,30 @@ OllamaFlow continuously monitors backend health:
       "num_ctx": 4096,
       "temperature": 0.8
     }
+  }
+}
+```
+
+### Backend Authentication & Request Customization
+
+Backends support additional properties for authenticating with upstream services:
+
+* **`BearerToken`**: Adds `Authorization: Bearer {token}` header to all requests
+* **`Querystring`**: Appends querystring to URLs (e.g., `api-version=2024-01`). Do not include the leading `?`; separate multiple key-value pairs with `&` (e.g., `foo=bar&key=val`)
+* **`Headers`**: Adds custom headers to all requests
+
+Example for Azure OpenAI:
+
+```json
+{
+  "Identifier": "azure-openai",
+  "Hostname": "my-resource.openai.azure.com",
+  "Port": 443,
+  "Ssl": true,
+  "BearerToken": "your-azure-api-key",
+  "Querystring": "api-version=2024-02-15-preview",
+  "Headers": {
+    "X-MS-Region": "eastus"
   }
 }
 ```

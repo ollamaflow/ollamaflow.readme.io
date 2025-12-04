@@ -121,7 +121,7 @@ OllamaFlow supports connecting to backends that require authentication or custom
   - Azure OpenAI Service
   - Custom inference endpoints with bearer authentication
 
-* **`Querystring`**: Appends a querystring to all URLs when communicating with the backend. Useful for:
+* **`Querystring`**: Appends a querystring to all URLs when communicating with the backend. Do not include the leading `?`; separate multiple key-value pairs with `&` (e.g., `foo=bar&key=val`). Useful for:
   - API versioning (e.g., `api-version=2024-01`)
   - Deployment targeting (e.g., `deployment=gpt-4`)
   - Custom routing parameters
