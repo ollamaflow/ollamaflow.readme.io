@@ -552,8 +552,4 @@ sudo tee /etc/logrotate.d/ollamaflow > /dev/null << 'EOF'
 EOF
 ```
 
-## Next Steps
-
-* Review [Configuration Reference](configuration-reference.md) for detailed settings
-* Explore [API Documentation](api-reference.md) for integration
-* Check [Monitoring and Observability](monitoring.md) for production insights
+<br />

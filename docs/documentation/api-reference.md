@@ -926,8 +926,6 @@ OllamaFlow supports both Ollama and OpenAI client libraries:
 
 Simply point these libraries to your OllamaFlow endpoint instead of a direct Ollama or OpenAI instance. For OpenAI libraries, use the base URL `http://your-ollamaflow-host:43411/v1`.
 
-## Next Steps
+## User Interface
 
-* Explore [Configuration Examples](configuration-examples.md) for common scenarios
-* Review [REST API Basics](rest-api-basics.md) for API fundamentals
-* Check [Monitoring and Observability](monitoring.md) for production insights
+Download the web user interface for OllamaFlow [here](https://github.com/ollamaflow/ui) .
