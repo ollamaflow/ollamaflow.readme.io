@@ -573,8 +573,35 @@ curl -X PUT \
     "HealthyThreshold": 2,
     "MaxParallelRequests": 8,
     "RateLimitRequestsThreshold": 20,
+    "BearerToken": null,
+    "Querystring": null,
+    "Headers": {},
     "LogRequestBody": false,
     "LogResponseBody": false
+  }' \
+  http://localhost:43411/v1.0/backends
+```
+
+#### Create Backend with Authentication
+
+For backends requiring authentication (e.g., OpenAI-compatible APIs, Azure OpenAI):
+
+```bash
+curl -X PUT \
+  -H "Authorization: Bearer your-admin-token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Identifier": "azure-openai",
+    "Name": "Azure OpenAI Service",
+    "Hostname": "my-resource.openai.azure.com",
+    "Port": 443,
+    "Ssl": true,
+    "BearerToken": "your-azure-api-key",
+    "Querystring": "api-version=2024-02-15-preview",
+    "Headers": {
+      "X-MS-Region": "eastus"
+    },
+    "MaxParallelRequests": 10
   }' \
   http://localhost:43411/v1.0/backends
 ```
@@ -649,6 +676,9 @@ curl -H "Authorization: Bearer your-admin-token" \
         "howdy": "doody"
       }
     },
+    "BearerToken": null,
+    "Querystring": null,
+    "Headers": {},
     "AllowEmbeddings": true,
     "AllowCompletions": true,
     "Active": true,
@@ -700,6 +730,9 @@ curl -H "Authorization: Bearer your-admin-token" \
       "howdy": "doody"
     }
   },
+  "BearerToken": null,
+  "Querystring": null,
+  "Headers": {},
   "AllowEmbeddings": true,
   "AllowCompletions": true,
   "Active": true,
