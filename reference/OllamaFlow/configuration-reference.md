@@ -242,10 +242,6 @@ Frontends are virtual Ollama endpoints that clients connect to. They are stored 
   "UseStickySessions": false,
   "StickySessionExpirationMs": 1800000,
   "Active": true
-<<<<<<< HEAD
-}
-```
-=======
 }
 ```
 
@@ -272,6 +268,14 @@ Frontends are virtual Ollama endpoints that clients connect to. They are stored 
 | `LogRequestBody`              | boolean | `false`        | Log request bodies                               |
 | `LogResponseBody`             | boolean | `false`        | Log response bodies                              |
 | `Active`                      | boolean | `true`         | Whether frontend is active                       |
+
+```
+
+
+
+
+
+```
 
 ### Load Balancing Options
 
@@ -317,7 +321,7 @@ Properties are merged with client requests, with pinned properties taking preced
 
 ## Backend Configuration
 
-Backends represent physical Ollama instances in your infrastructure. 
+Backends represent physical Ollama instances in your infrastructure.
 
 ### Backend Object Structure
 
@@ -336,6 +340,9 @@ Backends represent physical Ollama instances in your infrastructure.
   "RateLimitRequestsThreshold": 20,
   "AllowEmbeddings": true,
   "AllowCompletions": true,
+  "BearerToken": null,
+  "Querystring": "",
+  "Headers": {},
   "PinnedEmbeddingsProperties": {
     "options": {
       "num_ctx": 512
@@ -356,27 +363,29 @@ Backends represent physical Ollama instances in your infrastructure.
 
 ### Backend Properties
 
-| Property                      | Type    | Default  | Description                                           |
-| ----------------------------- | ------- | -------- | ----------------------------------------------------- |
-| `Identifier`                  | string  | Required | Unique identifier for this backend                    |
-| `Name`                        | string  | Required | Human-readable name                                   |
-| `Hostname`                    | string  | Required | Backend server hostname/IP                            |
-| `Port`                        | integer | `11434`  | Backend server port                                   |
-| `Ssl`                         | boolean | `false`  | Use HTTPS for backend communication                   |
-| `UnhealthyThreshold`          | integer | `2`      | Failed checks before marking unhealthy                |
-| `HealthyThreshold`            | integer | `2`      | Successful checks before marking healthy              |
-| `HealthCheckMethod`           | string  | `"GET"`  | HTTP method for health checks, either `GET` or `HEAD` |
-| `HealthCheckUrl`              | string  | `"/"`    | URL path for health checks                            |
-| `MaxParallelRequests`         | integer | `4`      | Maximum concurrent requests                           |
-| `RateLimitRequestsThreshold`  | integer | `10`     | Rate limiting threshold                               |
-| `AllowEmbeddings`             | boolean | `true`   | Allow embeddings API requests                         |
-| `AllowCompletions`            | boolean | `true`   | Allow completions API requests                        |
-| `PinnedEmbeddingsProperties`  | object  | `{}`     | Key-value pairs merged into embeddings requests       |
-| `PinnedCompletionsProperties` | object  | `{}`     | Key-value pairs merged into completions requests      |
-| `LogRequestFull`              | boolean | `false`  | Log complete requests                                 |
-| `LogRequestBody`              | boolean | `false`  | Log request bodies                                    |
-| `LogResponseBody`             | boolean | `false`  | Log response bodies                                   |
-| `Active`                      | boolean | `true`   | Whether backend is active                             |
+| Property                      | Type       | Default  | Description                                                                                                     |
+| ----------------------------- | ---------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `Identifier`                  | string     | Required | Unique identifier for this backend                                                                              |
+| `Name`                        | string     | Required | Human-readable name                                                                                             |
+| `Hostname`                    | string     | Required | Backend server hostname/IP                                                                                      |
+| `Port`                        | integer    | `11434`  | Backend server port                                                                                             |
+| `Ssl`                         | boolean    | `false`  | Use HTTPS for backend communication                                                                             |
+| `UnhealthyThreshold`          | integer    | `2`      | Failed checks before marking unhealthy                                                                          |
+| `HealthyThreshold`            | integer    | `2`      | Successful checks before marking healthy                                                                        |
+| `HealthCheckMethod`           | string     | `"GET"`  | HTTP method for health checks, either `GET` or `HEAD`                                                           |
+| `HealthCheckUrl`              | string     | `"/"`    | URL path for health checks                                                                                      |
+| `MaxParallelRequests`         | integer    | `4`      | Maximum concurrent requests                                                                                     |
+| `RateLimitRequestsThreshold`  | integer    | `10`     | Rate limiting threshold                                                                                         |
+| `AllowEmbeddings`             | boolean    | `true`   | Allow embeddings API requests                                                                                   |
+| `AllowCompletions`            | boolean    | `true`   | Allow completions API requests                                                                                  |
+| `BearerToken`                 | string     | null     | Bearer token to attach to each request                                                                          |
+| `Querystring`                 | string     | null     | Querystring to attach to each request.  Do not include a leading `?`, and separate each key-value pair with `&` |
+| `Headers`                     | dictionary | `{}`     | Dictionary containing key-value pairs to attach as headers to each request                                      |
+| `PinnedCompletionsProperties` | object     | `{}`     | Key-value pairs merged into completions requests                                                                |
+| `LogRequestFull`              | boolean    | `false`  | Log complete requests                                                                                           |
+| `LogRequestBody`              | boolean    | `false`  | Log request bodies                                                                                              |
+| `LogResponseBody`             | boolean    | `false`  | Log response bodies                                                                                             |
+| `Active`                      | boolean    | `true`   | Whether backend is active                                                                                       |
 
 ### Health Check Configuration
 
@@ -461,7 +470,7 @@ Minimal configuration for testing:
 
 Frontend/Backend via API:
 
-```bash
+````bash
 # Create backend
 curl -X PUT -H "Authorization: Bearer test-token" \
   -H "Content-Type: application/json" \
@@ -577,7 +586,7 @@ Backends represent physical Ollama instances in your infrastructure.
   "LogResponseBody": false,
   "Active": true
 }
-```
+````
 
 ### Backend Properties
 
@@ -666,19 +675,19 @@ The merge order is: Client Request → Frontend Pinned Properties → Backend Pi
 Backends support additional request customization options for communicating with upstream services that require authentication or special parameters:
 
 * **`BearerToken`**: If set, OllamaFlow automatically adds an `Authorization: Bearer {token}` header to all requests sent to this backend. Useful for:
-  - OpenAI-compatible APIs requiring API keys
-  - Azure OpenAI Service authentication
-  - Custom inference endpoints with bearer authentication
+  * OpenAI-compatible APIs requiring API keys
+  * Azure OpenAI Service authentication
+  * Custom inference endpoints with bearer authentication
 
 * **`Querystring`**: If set, the specified querystring is appended to all URLs when communicating with this backend. Do not include the leading `?` character. Separate multiple key-value pairs with ampersands (e.g., `foo=bar&key=val`). Useful for:
-  - API versioning: `api-version=2024-01`
-  - Deployment targeting: `deployment=gpt-4`
-  - Custom routing parameters
+  * API versioning: `api-version=2024-01`
+  * Deployment targeting: `deployment=gpt-4`
+  * Custom routing parameters
 
 * **`Headers`**: A dictionary of custom headers added to all requests sent to this backend. Useful for:
-  - Organization identification: `X-Organization-Id: org-123`
-  - Custom routing headers: `X-Custom-Region: us-east`
-  - Compliance headers: `X-Audit-Id: audit-456`
+  * Organization identification: `X-Organization-Id: org-123`
+  * Custom routing headers: `X-Custom-Region: us-east`
+  * Compliance headers: `X-Audit-Id: audit-456`
 
 Example configuration for Azure OpenAI:
 
