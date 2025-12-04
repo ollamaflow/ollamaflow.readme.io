@@ -46,6 +46,7 @@ Physical Ollama instances in your infrastructure. Each backend:
 * **Controls request types** with `AllowEmbeddings` and `AllowCompletions` properties
 * **Enforces server-specific parameters** through pinned properties
 * **Supports API isolation** for dedicated embeddings or completions servers
+* **Authenticates with upstream services** via `BearerToken`, `Querystring`, and custom `Headers`
 
 ### 3. **Models**
 
@@ -110,6 +111,27 @@ Properties are merged in order: Client Request â†’ Frontend Pinned Properties â†
 * **Organization-wide defaults** at the frontend level
 * **Hardware-specific optimizations** at the backend level
 * **Layered compliance** ensuring all requests meet standards
+
+### **Backend Authentication & Request Customization**
+
+OllamaFlow supports connecting to backends that require authentication or custom request parameters:
+
+* **`BearerToken`**: Automatically adds an `Authorization: Bearer {token}` header to all requests sent to the backend. Useful for:
+  - OpenAI API and compatible services
+  - Azure OpenAI Service
+  - Custom inference endpoints with bearer authentication
+
+* **`Querystring`**: Appends a querystring to all URLs when communicating with the backend. Useful for:
+  - API versioning (e.g., `api-version=2024-01`)
+  - Deployment targeting (e.g., `deployment=gpt-4`)
+  - Custom routing parameters
+
+* **`Headers`**: Adds custom headers to all requests sent to the backend. Useful for:
+  - Organization identification
+  - Custom routing headers
+  - Compliance and audit headers
+
+This enables OllamaFlow to act as a unified gateway to multiple AI services including Ollama, OpenAI, Azure OpenAI, vLLM, and other OpenAI-compatible APIs.
 
 ## Use Cases
 
