@@ -24,6 +24,10 @@ A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends d
 | `LoadBalancing`             | Load balancing algorithm             | `RoundRobin`        |
 | `Backends`                  | List of backend identifiers to use   | `[]`                |
 | `RequiredModels`            | Models that must be available        | `[]`                |
+| `AllowEmbeddings`           | Allow embeddings API requests        | `true`              |
+| `AllowCompletions`          | Allow completions API requests       | `true`              |
+| `PinnedEmbeddingsProperties`| Enforce specific embeddings parameters | `{}`                |
+| `PinnedCompletionsProperties`| Enforce specific completion parameters | `{}`                |
 | `MaxRequestBodySize`        | Maximum request size in bytes        | `536870912` (512MB) |
 | `UseStickySessions`         | Enable session stickiness            | `false`             |
 | `StickySessionExpirationMs` | Session timeout in milliseconds      | `1800000` (30 min)  |
@@ -72,6 +76,35 @@ A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends d
 * Backend failures invalidate all associated sessions
 * Sessions are not persisted across OllamaFlow restarts
 
+### Security Controls
+
+Frontend security controls enable fine-grained access control and request parameter enforcement:
+
+#### Request Type Controls
+
+* **`AllowEmbeddings`**: Controls whether embeddings API endpoints are accessible through this frontend
+  - Ollama API: `/api/embed`
+  - OpenAI API: `/v1/embeddings`
+* **`AllowCompletions`**: Controls whether completion API endpoints are accessible through this frontend
+  - Ollama API: `/api/generate`, `/api/chat`
+  - OpenAI API: `/v1/completions`, `/v1/chat/completions`
+
+For a request to succeed, both the frontend and at least one assigned backend must allow the request type.
+
+#### Pinned Properties
+
+Pinned properties allow administrators to enforce specific parameters in requests:
+
+* **`PinnedEmbeddingsProperties`**: Key-value pairs automatically merged into all embeddings requests
+* **`PinnedCompletionsProperties`**: Key-value pairs automatically merged into all completion requests
+
+Common use cases:
+* Enforce maximum context size: `{"options": {"num_ctx": 2048}}`
+* Standardize temperature settings: `{"options": {"temperature": 0.7}}`
+* Override model selection: `{"model": "approved-model:latest"}`
+
+Properties are merged with client requests, with pinned properties taking precedence over client-specified values.
+
 ### Frontend Configuration Example
 
 ```json
@@ -83,6 +116,20 @@ A **Frontend** is a virtual Ollama endpoint that clients connect to. Frontends d
   "TimeoutMs": 90000,
   "Backends": ["gpu-1", "gpu-2", "gpu-3"],
   "RequiredModels": ["llama3:8b", "mistral:7b", "codellama"],
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "model": "nomic-embed-text",
+    "options": {
+      "temperature": 0.1
+    }
+  },
+  "PinnedCompletionsProperties": {
+    "options": {
+      "temperature": 0.7,
+      "num_ctx": 2048
+    }
+  },
   "MaxRequestBodySize": 1073741824,
   "UseStickySessions": true,
   "StickySessionExpirationMs": 3600000
@@ -108,6 +155,10 @@ A **Backend** represents a physical Ollama instance in your infrastructure. Back
 | `HealthyThreshold`           | Successful checks before marking healthy | `2`      |
 | `MaxParallelRequests`        | Maximum concurrent requests              | `4`      |
 | `RateLimitRequestsThreshold` | Rate limiting threshold                  | `10`     |
+| `AllowEmbeddings`            | Allow embeddings API requests            | `true`   |
+| `AllowCompletions`           | Allow completions API requests           | `true`   |
+| `PinnedEmbeddingsProperties` | Enforce specific embeddings parameters   | `{}`     |
+| `PinnedCompletionsProperties`| Enforce specific completion parameters   | `{}`     |
 
 ### Health Monitoring
 
@@ -123,6 +174,38 @@ OllamaFlow continuously monitors backend health:
 * **Unhealthy**: Backend has failed health checks and is excluded from rotation
 * **Unknown**: Initial state before first health check completion
 
+### Security Controls
+
+Backend security controls provide additional layers of request filtering and parameter enforcement:
+
+#### Request Type Controls
+
+* **`AllowEmbeddings`**: Controls whether this backend can process embeddings requests
+* **`AllowCompletions`**: Controls whether this backend can process completion requests
+
+Requests are only routed to backends that allow the specific request type. This enables:
+* Dedicated embeddings servers that only handle embeddings requests:
+  - Ollama API: `/api/embed`
+  - OpenAI API: `/v1/embeddings`
+* Completion-only servers that only handle completion requests:
+  - Ollama API: `/api/generate`, `/api/chat`
+  - OpenAI API: `/v1/completions`, `/v1/chat/completions`
+* Multi-tenant isolation by request type
+
+#### Pinned Properties
+
+Backend pinned properties provide server-level parameter enforcement:
+
+* **`PinnedEmbeddingsProperties`**: Applied to all embeddings requests routed to this backend
+* **`PinnedCompletionsProperties`**: Applied to all completion requests routed to this backend
+
+Backend pinned properties are merged after frontend pinned properties, allowing for:
+* Server-specific resource limits: `{"options": {"num_ctx": 1024}}`
+* Hardware-optimized settings: `{"options": {"num_gpu": 2}}`
+* Backend-specific model overrides: `{"model": "server-optimized-model"}`
+
+The merge order is: Client Request → Frontend Pinned Properties → Backend Pinned Properties, with later values taking precedence.
+
 ### Backend Configuration Example
 
 ```json
@@ -137,7 +220,20 @@ OllamaFlow continuously monitors backend health:
   "UnhealthyThreshold": 3,
   "HealthyThreshold": 2,
   "MaxParallelRequests": 8,
-  "RateLimitRequestsThreshold": 20
+  "RateLimitRequestsThreshold": 20,
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "options": {
+      "num_ctx": 512
+    }
+  },
+  "PinnedCompletionsProperties": {
+    "options": {
+      "num_ctx": 4096,
+      "temperature": 0.8
+    }
+  }
 }
 ```
 

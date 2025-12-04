@@ -343,6 +343,12 @@ Backends represent physical Ollama instances in your infrastructure.
       "temperature": 0.8
     }
   },
+  "BearerToken": "sk-your-api-key",
+  "Querystring": "api_version=2024-01",
+  "Headers": {
+    "X-Custom-Header": "custom-value",
+    "X-Organization-Id": "org-123"
+  },
   "LogRequestFull": false,
   "LogRequestBody": false,
   "LogResponseBody": false,
@@ -369,6 +375,9 @@ Backends represent physical Ollama instances in your infrastructure.
 | `AllowCompletions`           | boolean | `true`   | Allow completions API requests           |
 | `PinnedEmbeddingsProperties` | object  | `{}`     | Key-value pairs merged into embeddings requests |
 | `PinnedCompletionsProperties`| object  | `{}`     | Key-value pairs merged into completions requests |
+| `BearerToken`                | string  | `null`   | Bearer token for Authorization header    |
+| `Querystring`                | string  | `null`   | Querystring appended to backend URLs     |
+| `Headers`                    | object  | `{}`     | Custom headers added to backend requests |
 | `LogRequestFull`             | boolean | `false`  | Log complete requests                    |
 | `LogRequestBody`             | boolean | `false`  | Log request bodies                       |
 | `LogResponseBody`            | boolean | `false`  | Log response bodies                      |
@@ -427,6 +436,42 @@ Backend pinned properties are merged after frontend pinned properties, allowing 
 * Backend-specific model overrides: `{"model": "server-optimized-model"}`
 
 The merge order is: Client Request → Frontend Pinned Properties → Backend Pinned Properties, with later values taking precedence.
+
+#### Request Customization
+
+Backends support additional request customization options for communicating with upstream services that require authentication or special parameters:
+
+* **`BearerToken`**: If set, OllamaFlow automatically adds an `Authorization: Bearer {token}` header to all requests sent to this backend. Useful for:
+  - OpenAI-compatible APIs requiring API keys
+  - Azure OpenAI Service authentication
+  - Custom inference endpoints with bearer authentication
+
+* **`Querystring`**: If set, the specified querystring is appended to all URLs when communicating with this backend. Should not include the leading `?`. Useful for:
+  - API versioning: `api-version=2024-01`
+  - Deployment targeting: `deployment=gpt-4`
+  - Custom routing parameters
+
+* **`Headers`**: A dictionary of custom headers added to all requests sent to this backend. Useful for:
+  - Organization identification: `X-Organization-Id: org-123`
+  - Custom routing headers: `X-Custom-Region: us-east`
+  - Compliance headers: `X-Audit-Id: audit-456`
+
+Example configuration for Azure OpenAI:
+
+```json
+{
+  "Identifier": "azure-openai",
+  "Name": "Azure OpenAI Service",
+  "Hostname": "my-resource.openai.azure.com",
+  "Port": 443,
+  "Ssl": true,
+  "BearerToken": "your-azure-api-key",
+  "Querystring": "api-version=2024-02-15-preview",
+  "Headers": {
+    "X-MS-Region": "eastus"
+  }
+}
+```
 
 ## Environment Variables
 

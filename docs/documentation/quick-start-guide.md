@@ -145,6 +145,8 @@ curl -X PUT \
   http://localhost:43411/v1.0/backends
 ```
 
+> **Tip**: For backends requiring authentication (OpenAI, Azure OpenAI, etc.), you can add `BearerToken`, `Querystring`, and `Headers` properties. See the [Configuration Reference](configuration-reference.md) for details.
+
 ## Configure Your Frontend
 
 Update the frontend to use your backend:
