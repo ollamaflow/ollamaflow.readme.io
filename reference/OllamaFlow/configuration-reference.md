@@ -242,8 +242,232 @@ Frontends are virtual Ollama endpoints that clients connect to. They are stored 
   "UseStickySessions": false,
   "StickySessionExpirationMs": 1800000,
   "Active": true
+<<<<<<< HEAD
 }
 ```
+=======
+}
+```
+
+### Frontend Properties
+
+| Property                      | Type    | Default        | Description                                      |
+| ----------------------------- | ------- | -------------- | ------------------------------------------------ |
+| `Identifier`                  | string  | Required       | Unique identifier for this frontend              |
+| `Name`                        | string  | Required       | Human-readable name                              |
+| `Hostname`                    | string  | `"*"`          | Hostname pattern (* for catch-all)               |
+| `TimeoutMs`                   | integer | `60000`        | Request timeout in milliseconds                  |
+| `LoadBalancing`               | enum    | `"RoundRobin"` | Load balancing algorithm                         |
+| `BlockHttp10`                 | boolean | `true`         | Reject HTTP/1.0 requests                         |
+| `MaxRequestBodySize`          | integer | `536870912`    | Max request size in bytes (512MB)                |
+| `Backends`                    | array   | `[]`           | List of backend identifiers                      |
+| `RequiredModels`              | array   | `[]`           | Models that must be available                    |
+| `AllowEmbeddings`             | boolean | `true`         | Allow embeddings API requests                    |
+| `AllowCompletions`            | boolean | `true`         | Allow completions API requests                   |
+| `PinnedEmbeddingsProperties`  | object  | `{}`           | Key-value pairs merged into embeddings requests  |
+| `PinnedCompletionsProperties` | object  | `{}`           | Key-value pairs merged into completions requests |
+| `UseStickySessions`           | boolean | `false`        | Enable session stickiness                        |
+| `StickySessionExpirationMs`   | integer | `1800000`      | Session timeout (30 minutes, min: 10s, max: 24h) |
+| `LogRequestFull`              | boolean | `false`        | Log complete requests                            |
+| `LogRequestBody`              | boolean | `false`        | Log request bodies                               |
+| `LogResponseBody`             | boolean | `false`        | Log response bodies                              |
+| `Active`                      | boolean | `true`         | Whether frontend is active                       |
+
+### Load Balancing Options
+
+* `"RoundRobin"`: Cycle through backends sequentially
+* `"Random"`: Randomly select from healthy backends
+
+### Hostname Patterns
+
+* `"*"`: Match all hostnames (catch-all)
+* `"api.company.com"`: Exact hostname match
+* Multiple frontends can exist with different hostname patterns
+
+### Security Controls
+
+Frontend security controls enable fine-grained access control and request parameter enforcement:
+
+#### Request Type Controls
+
+* **`AllowEmbeddings`**: Controls whether embeddings API endpoints are accessible through this frontend
+  * Ollama API: `/api/embed`
+  * OpenAI API: `/v1/embeddings`
+* **`AllowCompletions`**: Controls whether completion API endpoints are accessible through this frontend
+  * Ollama API: `/api/generate`, `/api/chat`
+  * OpenAI API: `/v1/completions`, `/v1/chat/completions`
+
+For a request to succeed, both the frontend and at least one assigned backend must allow the request type.
+
+#### Pinned Properties
+
+Pinned properties allow administrators to enforce specific parameters in requests, providing security compliance and standardization:
+
+* **`PinnedEmbeddingsProperties`**: Key-value pairs automatically merged into all embeddings requests
+* **`PinnedCompletionsProperties`**: Key-value pairs automatically merged into all completion requests
+
+Common use cases:
+
+* Enforce maximum context size: `{"options": {"num_ctx": 2048}}`
+* Standardize temperature settings: `{"options": {"temperature": 0.7}}`
+* Override model selection: `{"model": "approved-model:latest"}`
+* Set organizational defaults: `{"options": {"top_p": 0.9, "top_k": 40}}`
+
+Properties are merged with client requests, with pinned properties taking precedence over client-specified values.
+
+## Backend Configuration
+
+Backends represent physical Ollama instances in your infrastructure. 
+
+### Backend Object Structure
+
+```json
+{
+  "Identifier": "gpu-server-1",
+  "Name": "Primary GPU Server",
+  "Hostname": "192.168.1.100",
+  "Port": 11434,
+  "Ssl": false,
+  "UnhealthyThreshold": 3,
+  "HealthyThreshold": 2,
+  "HealthCheckMethod": "GET",
+  "HealthCheckUrl": "/",
+  "MaxParallelRequests": 8,
+  "RateLimitRequestsThreshold": 20,
+  "AllowEmbeddings": true,
+  "AllowCompletions": true,
+  "PinnedEmbeddingsProperties": {
+    "options": {
+      "num_ctx": 512
+    }
+  },
+  "PinnedCompletionsProperties": {
+    "options": {
+      "num_ctx": 4096,
+      "temperature": 0.8
+    }
+  },
+  "LogRequestFull": false,
+  "LogRequestBody": false,
+  "LogResponseBody": false,
+  "Active": true
+}
+```
+
+### Backend Properties
+
+| Property                      | Type    | Default  | Description                                           |
+| ----------------------------- | ------- | -------- | ----------------------------------------------------- |
+| `Identifier`                  | string  | Required | Unique identifier for this backend                    |
+| `Name`                        | string  | Required | Human-readable name                                   |
+| `Hostname`                    | string  | Required | Backend server hostname/IP                            |
+| `Port`                        | integer | `11434`  | Backend server port                                   |
+| `Ssl`                         | boolean | `false`  | Use HTTPS for backend communication                   |
+| `UnhealthyThreshold`          | integer | `2`      | Failed checks before marking unhealthy                |
+| `HealthyThreshold`            | integer | `2`      | Successful checks before marking healthy              |
+| `HealthCheckMethod`           | string  | `"GET"`  | HTTP method for health checks, either `GET` or `HEAD` |
+| `HealthCheckUrl`              | string  | `"/"`    | URL path for health checks                            |
+| `MaxParallelRequests`         | integer | `4`      | Maximum concurrent requests                           |
+| `RateLimitRequestsThreshold`  | integer | `10`     | Rate limiting threshold                               |
+| `AllowEmbeddings`             | boolean | `true`   | Allow embeddings API requests                         |
+| `AllowCompletions`            | boolean | `true`   | Allow completions API requests                        |
+| `PinnedEmbeddingsProperties`  | object  | `{}`     | Key-value pairs merged into embeddings requests       |
+| `PinnedCompletionsProperties` | object  | `{}`     | Key-value pairs merged into completions requests      |
+| `LogRequestFull`              | boolean | `false`  | Log complete requests                                 |
+| `LogRequestBody`              | boolean | `false`  | Log request bodies                                    |
+| `LogResponseBody`             | boolean | `false`  | Log response bodies                                   |
+| `Active`                      | boolean | `true`   | Whether backend is active                             |
+
+### Health Check Configuration
+
+Health checks validate backend availability:
+
+* **Method**: HTTP method (`GET`, `HEAD`)
+* **URL**: Path to check (e.g., `/`, `/api/version`, `/health`)
+* **Thresholds**: Number of consecutive successes/failures to change state
+
+Common health check endpoints:
+
+* `HEAD /`: Basic connectivity check for Ollama
+* `GET /health`: Basic connectivity check for vLLM
+
+### Rate Limiting
+
+Backends can enforce rate limits:
+
+* Requests exceeding `RateLimitRequestsThreshold` receive HTTP 429
+* Rate limiting is per backend, not global
+* Helps protect individual Ollama instances from overload
+
+### Security Controls
+
+Backend security controls provide additional layers of request filtering and parameter enforcement:
+
+#### Request Type Controls
+
+* **`AllowEmbeddings`**: Controls whether this backend can process embeddings requests
+* **`AllowCompletions`**: Controls whether this backend can process completion requests
+
+Requests are only routed to backends that allow the specific request type. This enables:
+
+* Dedicated embeddings servers that only handle embeddings requests:
+  * Ollama API: `/api/embed`
+  * OpenAI API: `/v1/embeddings`
+* Completion-only servers that only handle completion requests:
+  * Ollama API: `/api/generate`, `/api/chat`
+  * OpenAI API: `/v1/completions`, `/v1/chat/completions`
+* Multi-tenant isolation by request type
+
+#### Pinned Properties
+
+Backend pinned properties provide server-level parameter enforcement:
+
+* **`PinnedEmbeddingsProperties`**: Applied to all embeddings requests routed to this backend
+* **`PinnedCompletionsProperties`**: Applied to all completion requests routed to this backend
+
+Backend pinned properties are merged after frontend pinned properties, allowing for:
+
+* Server-specific resource limits: `{"options": {"num_ctx": 1024}}`
+* Hardware-optimized settings: `{"options": {"num_gpu": 2}}`
+* Backend-specific model overrides: `{"model": "server-optimized-model"}`
+
+The merge order is: Client Request → Frontend Pinned Properties → Backend Pinned Properties, with later values taking precedence.
+
+<br />
+
+```bash
+docker run -d \
+  -e OLLAMAFLOW_PORT=8080 \
+  -e OLLAMAFLOW_ADMIN_TOKEN=my-secure-token \
+  -e ASPNETCORE_ENVIRONMENT=Production \
+  -p 8080:8080 \
+  jchristn/ollamaflow
+```
+
+## Configuration Examples
+
+### Basic Single Backend
+
+Minimal configuration for testing:
+
+```json
+{
+  "Webserver": {
+    "Port": 43411
+  },
+  "AdminBearerTokens": ["test-token"]
+}
+```
+
+Frontend/Backend via API:
+
+```bash
+# Create backend
+curl -X PUT -H "Authorization: Bearer test-token" \
+  -H "Content-Type: application/json" \
+  -d '{"Identifier": "local", "Hostname": "localhost", "Port": 11434}' \
+  http://localhost:43411/v1.0/backends
+>>>>>>> 7087d02bef34583fd5434e8e29aad06934988889
 
 ### Frontend Properties
 
